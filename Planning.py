@@ -22,7 +22,7 @@ from Prediction import *
 from _imports import *
 from abcd import _Abcd
 from cliffsDelta import *
-from contrastset import *
+# from contrastset import *
 # from dectree import *
 from hist import *
 from smote import *
@@ -209,11 +209,6 @@ class treatments():
     # Main
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-    # Training data
-    # if self.smoteit:
-    # print('Smoting')
-    #   self.train_DF = SMOTE(data = self.train_DF, atleast = 50, atmost = 100)
-
     # Decision Tree
     tmpRow = []
     t = discreteNums(
@@ -247,7 +242,7 @@ class treatments():
 
         # Now generate 4 patches (one for each contrast set). Each patch has
         # 10 potential solutions..
-        patch = node.patches(self.keys, N_Patches=10)
+        patch = node.patches(self.keys, N_Patches=1)
 
         found = False
         while not found and patch:
@@ -256,7 +251,7 @@ class treatments():
           tmpTbl = clone(self.test_DF,
                          rows=[k.cells for k in p],
                          discrete=True)
-          mass = CART(
+          mass = rforest(
               createTbl(
                   self.train,
                   _smote=False,
@@ -288,16 +283,16 @@ class treatments():
 def planningTest():
   # Test contrast sets
   n = 0
-  dir = '../Data'
+  dir = 'Data/'
   one, two = explore(dir)
   # Training data
   newTab = treatments(train=one[n],
                       test=two[n],
-                      verbose=False,
+                      verbose=True,
                       smoteit=False).main()
 
   # <<<<<<<<<<< Debug >>>>>>>>>>>>>>>
-  # set_trace()
+  set_trace()
 
 if __name__ == '__main__':
   planningTest()
