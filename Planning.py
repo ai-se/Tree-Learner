@@ -158,10 +158,11 @@ class treatments():
     def range(a_tuple):
       return ((a_tuple[0]) + (a_tuple[1])) / 2
     vals = []
-    current = store(node)
+    current = store(node)  # Store current sample
     while node.lvl > -1:
-      node = node.up
+      node = node.up  # Move to tree root
 
+    # Get all the terminal nodes
     leaves = self.flatten([self.leaves(_k) for _k in node.kids])
 
     for leaf in leaves:
@@ -175,6 +176,7 @@ class treatments():
       l.dist = np.sqrt(np.sum(dist))
       vals.append(l)
 
+    set_trace()
     vals = sorted(vals, key=lambda F: F.DoC, reverse=False)
     best = [v for v in vals if v.score < alpha * current.score]
     if not len(best) > 0:
@@ -238,7 +240,7 @@ class treatments():
         # Examine 4 possible contrast set values (nearest best, farthest best,
         # best branch in the same level, and the nearest branch in the upper
         # level.) I call these nearest, farthest, far, and near.
-        node.contrastSet = [far, farthest, near, nearest]
+        node.contrastSet = [farthest]
 
         # Now generate 4 patches (one for each contrast set). Each patch has
         # 10 potential solutions..
