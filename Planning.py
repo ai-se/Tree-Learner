@@ -82,7 +82,7 @@ class treatments():
   "Treatments"
 
   def __init__(self, train=None, test=None,
-               verbose=True, smoteit=False):
+               verbose=True, smoteit=True):
     self.train, self.test = train, test
     self.train_DF = createTbl(train, _smote=smoteit, isBin=True)
     self.test_DF = createTbl(test, isBin=True)
@@ -175,8 +175,6 @@ class treatments():
               [(range(b[1]) - range(bb[1])) ** 2 for bb in current.node.branch if b[0] == bb[0]])
       l.dist = np.sqrt(np.sum(dist))
       vals.append(l)
-
-    set_trace()
     vals = sorted(vals, key=lambda F: F.DoC, reverse=False)
     best = [v for v in vals if v.score < alpha * current.score]
     if not len(best) > 0:
@@ -219,8 +217,8 @@ class treatments():
             lambda x: x.cells,
             self.train_DF._rows))
     myTree = tdiv(t)
-    if self.verbose:
-      showTdiv(myTree)
+#     if self.verbose:
+#       showTdiv(myTree)
 
     # Testing data
     testCase = self.test_DF._rows
@@ -240,7 +238,7 @@ class treatments():
         # Examine 4 possible contrast set values (nearest best, farthest best,
         # best branch in the same level, and the nearest branch in the upper
         # level.) I call these nearest, farthest, far, and near.
-        node.contrastSet = [farthest]
+        node.contrastSet = [far]
 
         # Now generate 4 patches (one for each contrast set). Each patch has
         # 10 potential solutions..
