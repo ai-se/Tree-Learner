@@ -107,8 +107,10 @@ class run():
 
 
 def _test(file='ant'):
-  R = run(dataName=file, reps=24).go()
+  for file in ['ivy', 'lucene', 'poi', 'jedit']:
+    print('##', file)
+    R = run(dataName=file, reps=8).go()
 
 if __name__ == '__main__':
-  #   _test(file='ant')
-  eval(cmd())
+  _test(file='ant')
+#   eval(cmd())

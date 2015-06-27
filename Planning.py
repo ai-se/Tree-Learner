@@ -152,13 +152,14 @@ class treatments():
         seen(node.node.branch)
     return attr
 
-  def finder2(self, node, alpha=0.5):
+  def finder2(self, node, alpha=0.5, pos='far'):
     """
     finder2 is a more elegant version of finder that performs a search on
     the entire tree to find leaves which are better than a certain 'node'
     """
 
     euclidDist = lambda a, b: ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5
+    midDist = lambda a, b: abs(sum(b) - sum(a)) / 2
     vals = []
     current = store(node)  # Store current sample
     while node.lvl > -1:
@@ -173,7 +174,7 @@ class treatments():
         dist = []
         if b[0] in [bb[0] for bb in current.node.branch]:
           l.DoC += 1
-          dist.extend([euclidDist(b[1], bb[1])
+          dist.extend([midDist(b[1], bb[1])
                        for bb in current.node.branch if b[0] == bb[0]])
       l.dist = np.sqrt(np.sum(dist))
       vals.append(l)
@@ -192,13 +193,11 @@ class treatments():
           {dd: sorted([v for v in best if v.DoC == dd], key=lambda F: F.dist)})
       attr.update({dd: self.attributes(
           sorted([v for v in best if v.DoC == dd], key=lambda F: F.dist))})
-    # set_trace()
-    # print(attr, unq)
-    try:
-      return bests, attr[unq[-1]][0]  # , attr[
-#           unq[0]][-1], attr[unq[-1]][0], attr[unq[-1]][-1]
-    except IndexError:
-      set_trace()
+
+    if pos == 'near':
+      return attr[unq[-1]][0]
+    elif pos == 'far':
+      return attr[unq[0]][-1]
 
   def getKey(self):
     keys = {}
@@ -228,32 +227,15 @@ class treatments():
         node.contrastSet = []
         self.mod.append(node.newRow)
       else:
-        _, nearest = self.finder2(node.loc)
-
-        # Examine 4 possible contrast set values: nearest, farthest, far, and
-        # near.
-        node.contrastSet = [nearest]
+        node.contrastSet = [self.finder2(node.loc, pos='near')]
 
         # Now generate 1 potential patch
         patch = node.patches(self.keys, N_Patches=1)
 
-        found = False
-        while not found and patch:
-          # print(len(patch))
-          p = patch.pop()
-          tmpTbl = clone(self.test_DF,
-                         rows=[k.cells for k in p],
-                         discrete=True)
-          mass = rforest(
-              createTbl(
-                  self.train,
-                  _smote=False,
-                  isBin=True),
-              tmpTbl,
-              tunings=None,
-              smoteit=True,
-              duplicate=True)
-          found = tC.cells[-2] > np.mean(mass)
+        p = patch.pop()
+        tmpTbl = clone(self.test_DF,
+                       rows=[k.cells for k in p],
+                       discrete=True)
         self.mod.append(choice(tmpTbl._rows))
 
       # <<<<<<<<<<< Debug >>>>>>>>>>>>>>>
