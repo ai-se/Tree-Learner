@@ -130,7 +130,7 @@ def rforest(train, test, tunings=None, smoteit=True, duplicate=True):
   klass = train_DF[train_DF.columns[-2]]
   # set_trace()
   clf.fit(train_DF[features], klass)
-  preds = clf.predict(test_DF[test_DF.columns[:-2]]).tolist()
+  preds = clf.predict(test_DF[test_DF.columns[:-2]])
   return preds
 
 

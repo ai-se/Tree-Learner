@@ -26,6 +26,7 @@ from sk import rdivDemo
 import numpy as np
 import pandas as pd
 import csv
+from numpy import sum
 
 
 class run():
@@ -43,10 +44,6 @@ class run():
           Prune=False,
           infoPrune=0.75):
     self.pred = pred
-    self.extent = extent
-    self.fSelect = fSelect
-    self.Prune = Prune
-    self.infoPrune = infoPrune
     self.dataName = dataName
     self.out, self.out_pred = [], []
     self._smoteit = _smoteit
@@ -96,8 +93,7 @@ class run():
       predTest = clone(test_df, rows=predRows)
       newTab = treatments(
           train=self.train[
-              self._n], test=self.test[
-              self._n]).main()
+              self._n], test_DF=predTest).main()
 
       after = self.pred(train_DF, newTab,
                         tunings=self.tunedParams,
@@ -105,108 +101,13 @@ class run():
 
       self.out_pred.append(_Abcd(before=actual, after=before))
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
-      self.out.append(delta)
-    print(self.out)
+      frac = sum(after) / sum(before)
+      self.out.append(frac)
+      print(self.out)
 
 
-def _test(file):
-  """
-  Baselining
-  """
-  R = run(
-      dataName=file,
-      extent=0.00,
-      reps=24,
-      fSelect=False,
-      Prune=False,
-      infoPrune=None).go()
-
-#   """
-#   Mutation without Feature Selection
-#   """
-#   R = run(
-#       dataName=file,
-#       extent=0.25,
-#       reps=24,
-#       fSelect=False,
-#       Prune=False,
-#       infoPrune=None).go()
-#
-#   R = run(
-#       dataName=file,
-#       extent=0.50,
-#       reps=24,
-#       fSelect=False,
-#       Prune=False,
-#       infoPrune=None).go()
-#
-#   R = run(
-#       dataName=file,
-#       extent=0.75,
-#       reps=24,
-#       fSelect=False,
-#       Prune=False,
-#       infoPrune=None).go()
-#
-#   """
-#   Mutation with Feature Selection
-#   """
-#   R = run(
-#       dataName=file,
-#       extent=0.25,
-#       reps=24,
-#       fSelect=True,
-#       Prune=False,
-#       infoPrune=None).go()
-#   R = run(
-#       dataName=file,
-#       extent=0.50,
-#       reps=24,
-#       fSelect=True,
-#       Prune=False,
-#       infoPrune=None).go()
-#   R = run(
-#       dataName=file,
-#       extent=0.75,
-#       reps=24,
-#       fSelect=True,
-#       Prune=False,
-#       infoPrune=None).go()
-#
-#   """
-#   Information Pruning with Feature Selection
-#   """
-#   R = run(
-#       dataName=file,
-#       extent=0.25,
-#       reps=24,
-#       fSelect=True,
-#       Prune=True,
-#       infoPrune=0.5).go()
-#
-#   R = run(
-#       dataName=file,
-#       extent=0.50,
-#       reps=24,
-#       fSelect=True,
-#       Prune=True,
-#       infoPrune=0.50).go()
-#
-#   R = run(
-#       dataName=file,
-#       extent=0.75,
-#       reps=24,
-#       fSelect=True,
-#       Prune=True,
-#       infoPrune=0.5).go()
+def _test(file='ant'):
+  R = run(dataName=file, reps=24).go()
 
 if __name__ == '__main__':
-
-  R = run(
-      dataName='ant',
-      extent=0.75,
-      reps=24,
-      fSelect=True,
-      Prune=False,
-      infoPrune=0.5).go()
-#   eval(cmd())
+  _test(file='ant')

@@ -81,11 +81,14 @@ class treatments():
 
   "Treatments"
 
-  def __init__(self, train=None, test=None,
+  def __init__(self, train=None, test=None, test_DF=None,
                verbose=True, smoteit=True):
     self.train, self.test = train, test
     self.train_DF = createTbl(train, _smote=smoteit, isBin=True)
-    self.test_DF = createTbl(test, isBin=True)
+    if not test_DF:
+      self.test_DF = createTbl(test, isBin=True)
+    else:
+      self.test_DF = test_DF
     self.verbose, self.smoteit = verbose, smoteit
     self.mod, self.keys = [], self.getKey()
 
@@ -184,7 +187,7 @@ class treatments():
     # set_trace()
     attr = {}
     bests = {}
-    unq = list(set([v.DoC for v in best]))  # A list of all DoCs..
+    unq = sorted(list(set([v.DoC for v in best])))  # A list of all DoCs..
     for dd in unq:
       bests.update(
           {dd: sorted([v for v in best if v.DoC == dd], key=lambda F: F.dist)})
@@ -193,8 +196,8 @@ class treatments():
     # set_trace()
     # print(attr, unq)
     try:
-      return bests, attr[unq[0]][0], attr[
-          unq[0]][-1], attr[unq[-1]][0], attr[unq[-1]][-1]
+      return bests, attr[unq[-1]][0]  # , attr[
+#           unq[0]][-1], attr[unq[-1]][0], attr[unq[-1]][-1]
     except IndexError:
       set_trace()
 
@@ -210,20 +213,14 @@ class treatments():
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     # Decision Tree
-    tmpRow = []
     t = discreteNums(
         self.train_DF,
-        map(
-            lambda x: x.cells,
+        map(lambda x: x.cells,
             self.train_DF._rows))
     myTree = tdiv(t)
-#     if self.verbose:
-#       showTdiv(myTree)
 
     # Testing data
     testCase = self.test_DF._rows
-    newTab = []
-    weights = []
     for tC in testCase:
       newRow = tC
       node = deltas(newRow, myTree)  # A delta instance for the rows
@@ -232,21 +229,18 @@ class treatments():
         node.contrastSet = []
         self.mod.append(node.newRow)
       else:
-        bests, far, farthest, near, nearest = self.finder2(node.loc)
-        # set_trace()
+        _, nearest = self.finder2(node.loc)
 
-        # Examine 4 possible contrast set values (nearest best, farthest best,
-        # best branch in the same level, and the nearest branch in the upper
-        # level.) I call these nearest, farthest, far, and near.
-        node.contrastSet = [far]
+        # Examine 4 possible contrast set values: nearest, farthest, far, and
+        # near.
+        node.contrastSet = [nearest]
 
-        # Now generate 4 patches (one for each contrast set). Each patch has
-        # 10 potential solutions..
+        # Now generate 1 potential patch
         patch = node.patches(self.keys, N_Patches=1)
 
         found = False
         while not found and patch:
-         # print(len(patch))
+          # print(len(patch))
           p = patch.pop()
           tmpTbl = clone(self.test_DF,
                          rows=[k.cells for k in p],
@@ -260,36 +254,24 @@ class treatments():
               tunings=None,
               smoteit=True,
               duplicate=True)
-          # print(tC.cells[-2] > np.mean(mass))
           found = tC.cells[-2] > np.mean(mass)
-          # life -= 1;
-          # print(len(patch))
-          # set_trace()
         self.mod.append(choice(tmpTbl._rows))
 
       # <<<<<<<<<<< Debug >>>>>>>>>>>>>>>
         # set_trace()
-
-#       if node.score == 0:
-#         node.contrastSet = []
-#         self.mod.append(node.newRow)
-#       else:
-#         node.contrastSet = self.finder(node.loc)
-#         self.mod.append(node.applyPatch(self.keys))
-#
     return clone(self.test_DF, rows=[k.cells for k in self.mod], discrete=True)
 
 
 def planningTest():
   # Test contrast sets
   n = 0
-  dir = 'Data/'
-  one, two = explore(dir)
+  Dir = 'Data/'
+  one, two = explore(Dir)
   # Training data
-  newTab = treatments(train=one[n],
-                      test=two[n],
-                      verbose=True,
-                      smoteit=False).main()
+  _ = treatments(train=one[n],
+                 test=two[n],
+                 verbose=True,
+                 smoteit=False).main()
 
   # <<<<<<<<<<< Debug >>>>>>>>>>>>>>>
   set_trace()
