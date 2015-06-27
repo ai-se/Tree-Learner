@@ -110,4 +110,5 @@ def _test(file='ant'):
   R = run(dataName=file, reps=24).go()
 
 if __name__ == '__main__':
-  _test(file='ant')
+  #   _test(file='ant')
+  eval(cmd())

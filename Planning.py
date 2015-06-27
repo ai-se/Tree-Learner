@@ -158,8 +158,7 @@ class treatments():
     the entire tree to find leaves which are better than a certain 'node'
     """
 
-    def range(a_tuple):
-      return ((a_tuple[0]) + (a_tuple[1])) / 2
+    euclidDist = lambda a, b: ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5
     vals = []
     current = store(node)  # Store current sample
     while node.lvl > -1:
@@ -174,8 +173,8 @@ class treatments():
         dist = []
         if b[0] in [bb[0] for bb in current.node.branch]:
           l.DoC += 1
-          dist.extend(
-              [(range(b[1]) - range(bb[1])) ** 2 for bb in current.node.branch if b[0] == bb[0]])
+          dist.extend([euclidDist(b[1], bb[1])
+                       for bb in current.node.branch if b[0] == bb[0]])
       l.dist = np.sqrt(np.sum(dist))
       vals.append(l)
     vals = sorted(vals, key=lambda F: F.DoC, reverse=False)
