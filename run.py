@@ -28,6 +28,11 @@ import pandas as pd
 import csv
 from numpy import sum
 
+def write2file(data, fname='Untitled', ext='.txt'):
+  with open(fname+ext, 'w') as fwrite:
+    writer = csv.writer(fwrite, delimiter=',')
+    for b in data: 
+      writer.writerow(b)
 
 class run():
 
@@ -52,6 +57,11 @@ class run():
     self._n = _n
     self.tunedParams = None if not _tuneit else tuner(
         self.pred, self.train[_n])
+    self.headers = createTbl(
+        self.train[
+            self._n],
+        isBin=True,
+        bugThres=1).headers
 
   def categorize(self):
     dir = './Data'
@@ -69,9 +79,11 @@ class run():
         if name == self.dataName:
           return indx
 
-    return [
+    try: 
+      return [
         dat[0] for dat in withinClass(data[whereis()])], [
         dat[1] for dat in withinClass(data[whereis()])]  # Train, Test
+    except: set_trace()
 
   def go(self):
 
@@ -105,14 +117,72 @@ class run():
       self.out.append(frac)
     print(self.out)
 
-  def deltas():
-    orig = createTbl(self.test[self._n], isBin=True, bugThres=1)
-    rows = 
-  
+  def delta0(self, norm):
+    before, after = open('before.txt'), open('after.txt')
+    for line1, line2 in zip(before, after):
+      row1 = np.array([float(l) for l in line1.strip().split(',')[:-1]])
+      row2 = np.array([float(l) for l in line2.strip().split(',')])
+      yield ((row1-row2)/norm).tolist()
+
+
+  def deltas(self):
+    predRows = []
+    delta = []
+    train_DF = createTbl(self.train[self._n], isBin=True, bugThres=1)
+    test_df = createTbl(self.test[self._n], isBin=True, bugThres=1)
+    before = self.pred(train_DF, test_df,tunings=self.tunedParams,
+                       smoteit=True)
+    allRows = np.array(map(lambda Rows: np.array(Rows.cells[:-1]), train_DF._rows+test_df._rows))
+    def min_max():
+      N = len(allRows[0])
+      base = lambda X: sorted(X)[-1] - sorted(X)[0]
+      return [base([r[i] for r in allRows]) for i in xrange(N)]  
+
+    for predicted, row in zip(before, test_df._rows):
+      tmp = row.cells
+      tmp[-2] = predicted
+      if predicted > 0:
+        predRows.append(tmp)
+
+    write2file(predRows, fname='before') # save file
+    
+    """
+    Apply Learner
+    """    
+    for _ in xrange(1):
+      predTest = clone(test_df, rows=predRows)
+      newTab = treatments(train=self.train[self._n], test_DF=predTest).main()
+      newRows = np.array(map(lambda Rows: Rows.cells[:-1], newTab._rows))
+      write2file(newRows, fname='after') # save file
+      delta.append([d for d in self.delta0(norm=min_max())])
+
+    return delta[0]
+
+    # -------- DEBUG! --------
+    # set_trace()
+    
+
 def _test(file='ant'):
   for file in ['ivy', 'lucene', 'poi', 'jedit', 'ant']:
     print('##', file)
     R = run(dataName=file, reps=10).go()
+
+def deltaCSVwriter():
+  for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+    print('##', name)
+    delta = run(dataName=name, reps=1).deltas()
+    y = np.median(delta, axis=0)
+    yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
+    try:
+      dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
+        run(dataName=name).headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
+    except: set_trace()
+    dat = np.asarray([(d[0], n, d[1], d[2], d[3])
+                      for d, n in zip(dat1, range(1, 21))])
+    with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
+      writer = csv.writer(csvfile, delimiter=' ')
+      for el in dat[()]:
+        writer.writerow(el)
 
 
 def rdiv():
@@ -133,8 +203,14 @@ def rdiv():
   rdivDemo(lst, isLatex='True')
   set_trace()
 
+def deltaTest():
+  for file in ['ivy', 'lucene', 'poi', 'jedit', 'ant']:
+    print('##', file)
+    R = run(dataName=file, reps=10).deltas()
+
 
 if __name__ == '__main__':
-  #   _test(file='ant')
-  rdiv()
+    # _test(file='ant')
+  # deltaTest()
+  deltaCSVwriter()
 #   eval(cmd())

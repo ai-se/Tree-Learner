@@ -82,11 +82,11 @@ class treatments():
   "Treatments"
 
   def __init__(self, train=None, test=None, test_DF=None,
-               verbose=True, smoteit=True):
+               verbose=True, smoteit=True, bin=True):
     self.train, self.test = train, test
-    self.train_DF = createTbl(train, _smote=smoteit, isBin=True)
+    self.train_DF = createTbl(train, _smote=smoteit, isBin=bin)
     if not test_DF:
-      self.test_DF = createTbl(test, isBin=True)
+      self.test_DF = createTbl(test, isBin=bin)
     else:
       self.test_DF = test_DF
     self.verbose, self.smoteit = verbose, smoteit
