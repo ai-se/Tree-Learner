@@ -105,12 +105,36 @@ class run():
       self.out.append(frac)
     print(self.out)
 
-
+  def deltas():
+    orig = createTbl(self.test[self._n], isBin=True, bugThres=1)
+    rows = 
+  
 def _test(file='ant'):
-#  for file in ['ivy', 'lucene', 'poi', 'jedit']:
-#    print('##', file)
-    R = run(dataName=file, reps=24).go()
+  for file in ['ivy', 'lucene', 'poi', 'jedit', 'ant']:
+    print('##', file)
+    R = run(dataName=file, reps=10).go()
+
+
+def rdiv():
+  lst = []
+
+  def striplines(line):
+    listedline = line.strip().split(',')  # split around the = sign
+    listedline[0] = listedline[0][2:-1]
+    lists = [listedline[0]]
+    for ll in listedline[1:-1]:
+      lists.append(float(ll))
+    return lists
+
+  f = open('./data.txt')
+  for line in f:
+    lst.append(striplines(line[:-1]))
+
+  rdivDemo(lst, isLatex='True')
+  set_trace()
+
 
 if __name__ == '__main__':
-#  _test(file='ant')
-   eval(cmd())
+  #   _test(file='ant')
+  rdiv()
+#   eval(cmd())

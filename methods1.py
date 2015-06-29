@@ -12,7 +12,7 @@ from table import *
 from _imports.where2 import *
 import makeAmodel
 import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import smote
 
 
