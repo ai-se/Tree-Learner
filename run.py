@@ -122,7 +122,7 @@ class run():
     for line1, line2 in zip(before, after):
       row1 = np.array([float(l) for l in line1.strip().split(',')[:-1]])
       row2 = np.array([float(l) for l in line2.strip().split(',')])
-      yield ((row1-row2)/norm).tolist()
+      yield ((row2-row1)/norm).tolist()
 
 
   def deltas(self):
@@ -167,22 +167,38 @@ def _test(file='ant'):
     print('##', file)
     R = run(dataName=file, reps=10).go()
 
-def deltaCSVwriter():
-  for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
-    print('##', name)
-    delta = run(dataName=name, reps=1).deltas()
+def deltaCSVwriter(type='Indv'):
+  if type == 'Indv':
+    for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+      print('##', name)
+      delta = run(dataName=name, reps=10).deltas()
+      y = np.median(delta, axis=0)
+      yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
+      dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
+          run(dataName=name).headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
+      dat = np.asarray([(d[0], n, d[1], d[2], d[3])
+                        for d, n in zip(dat1, range(1, 21))])
+      with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=' ')
+        for el in dat[()]:
+          writer.writerow(el)
+  elif type == 'All':
+    delta = []
+    for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+      print('##', name)
+      delta.extend(run(dataName=name, reps=10).deltas())
     y = np.median(delta, axis=0)
     yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
-    try:
-      dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
-        run(dataName=name).headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
-    except: set_trace()
+    dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
+      run(dataName=name).headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
     dat = np.asarray([(d[0], n, d[1], d[2], d[3])
                       for d, n in zip(dat1, range(1, 21))])
-    with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
+    with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/all.csv', 'w') as csvfile:
       writer = csv.writer(csvfile, delimiter=' ')
       for el in dat[()]:
         writer.writerow(el)
+
+
 
 
 def rdiv():
@@ -212,5 +228,6 @@ def deltaTest():
 if __name__ == '__main__':
     # _test(file='ant')
   # deltaTest()
-  deltaCSVwriter()
+  deltaCSVwriter(type='All')
+  deltaCSVwriter(type='Indv')
 #   eval(cmd())

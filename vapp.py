@@ -14,6 +14,7 @@ from random import shuffle
 from subprocess import PIPE
 from subprocess import call
 import sys
+import csv
 
 # Update PYTHONPATH
 HOME = environ['HOME']
@@ -30,7 +31,7 @@ import pandas
 
 from Prediction import CART as cart
 from Prediction import formatData
-from Planning import *
+from Planner2 import *
 from cliffsDelta import cliffs
 from demos import cmd
 from methods1 import *
@@ -39,6 +40,12 @@ from sk import scottknott
 from smote import SMOTE
 from table import clone
 
+
+def write2file(data, fname='Untitled', ext='.txt'):
+  with open(fname+ext, 'w') as fwrite:
+    writer = csv.writer(fwrite, delimiter=',')
+    for b in data: 
+      writer.writerow(b)
 
 class predictor():
 
@@ -195,6 +202,40 @@ class fileHandler():
     after = predictor(train=train_df, test=newTab_df).rforest()
     return actual, before, after
 
+  def delta0(self):
+    before, after = open('before_cpm.txt'), open('after_cpm.txt')
+    for line1, line2 in zip(before, after):
+      row1 = np.array([float(l) for l in line1.strip().split(',')])
+      row2 = np.array([float(l) for l in line2.strip().split(',')])
+      try: yield np.bitwise_xor(row2,row1,dtype='int')
+      except: set_trace()
+
+
+  def deltas(self,name):
+    predRows = []
+    delta = []
+    data = self.explorer(name)
+    for d in data:
+      if name == d[0].strip().split('/')[-1]:
+        train = [d[0] + '/' + d[1][1]]
+        test = [d[0] + '/' + d[1][0]]
+        train_DF = createTbl(train, isBin=False)
+        test_df = createTbl(test, isBin=False)
+        self.headers = train_DF.headers
+        write2file(map(lambda r: r.cells[:-2], test_df._rows), fname='before_cpm') # save file
+        
+        """
+        Apply Learner
+        """    
+        for _ in xrange(1):
+          newTab = treatments(train=train, test=test
+          , smoteit=False, bin=False).main()
+          write2file(map(lambda r: r.cells[:-2], newTab._rows), fname='after_cpm') # save file
+          delta.append([d for d in self.delta0()])
+        
+        return np.array(np.sum(delta[0], axis=0), dtype='float')/np.size(delta[0], axis=0)
+
+
   def flatten(self, x):
     """
     Takes an N times nested list of list like [[a,b],[c, [d, e]],[f]]
@@ -216,7 +257,6 @@ class fileHandler():
     out_acc = [name]
     for _ in xrange(reps):
       data = self.explorer(name)
-      # self.preamble()
       for d in data:
         if name == d[0].strip().split('/')[-1]:
           #           set_trace()
@@ -233,20 +273,57 @@ class fileHandler():
 #     set_trace()
 
 
+def deltasTester(name):
+  # print('##', name)
+  f = fileHandler()
+  delta=[f.deltas(name) for _ in xrange(24)]
+  y = np.median(delta, axis=0)
+  yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
+  dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
+      f.headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
+  dat = np.asarray([(d[0], n, d[1], d[2], d[3])
+                    for d, n in zip(dat1, range(1, 21))])
+  with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
+    writer = csv.writer(csvfile, delimiter=' ')
+    for el in dat[()]:
+      writer.writerow(el)
+
+def rdiv():
+  lst = []
+
+  def striplines(line):
+    listedline = line.strip().split(',')  # split around the = sign
+    listedline[0] = listedline[0][2:-1]
+    lists = [listedline[0]]
+    for ll in listedline[1:-1]:
+      lists.append(float(ll))
+    return lists
+
+  f = open('./dataCPM.txt')
+  for line in f:
+    lst.append(striplines(line[:-1]))
+
+  rdivDemo(lst)
+  set_trace()
+
+
 
 def _test(name='Apache', doWhat='Accuracy'):
   Accuracy = []
   Gain = []
   medianDelta = []
-  a, b, c = fileHandler().main(name, reps=24)
+  a, b, c = fileHandler().main(name, reps=1)
   if doWhat == 'AUC':
     print(b)
   elif doWhat == 'Median':
     print(c)
 
 if __name__ == '__main__':
+ 
+  # rdiv()
   #   _testPlot()
   #  _test('BDBC', 'Median')
-  for name in ['Apache', 'BDBJ', 'LLVM', 'SQL', 'X264', 'BDBJ']:
-    _test(name='BDBC', doWhat='AUC')
+  for name in ['Apache', 'BDBJ', 'LLVM', 'X264']:
+    # deltasTester(name)
+    _test(name=name, doWhat='AUC')
 #   eval(cmd())
