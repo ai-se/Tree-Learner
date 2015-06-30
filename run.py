@@ -169,7 +169,7 @@ def _test(file='ant'):
 
 def deltaCSVwriter(type='Indv'):
   if type == 'Indv':
-    for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+    for name in ['jedit', 'ant']:
       print('##', name)
       delta = run(dataName=name, reps=10).deltas()
       y = np.median(delta, axis=0)
@@ -220,7 +220,7 @@ def rdiv():
   set_trace()
 
 def deltaTest():
-  for file in ['ivy', 'lucene', 'poi', 'jedit', 'ant']:
+  for file in ['jedit', 'ant']:
     print('##', file)
     R = run(dataName=file, reps=10).deltas()
 
@@ -228,6 +228,6 @@ def deltaTest():
 if __name__ == '__main__':
     # _test(file='ant')
   # deltaTest()
-  deltaCSVwriter(type='All')
+  # deltaCSVwriter(type='All')
   deltaCSVwriter(type='Indv')
 #   eval(cmd())
