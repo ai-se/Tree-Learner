@@ -31,18 +31,15 @@ P = python
 build:
 	$(RM) *.pyc	
 	$(P) $(FILES)
-#	$(J) $(JFLAGS) $(CP) $*
-# .java:
-# 	$(J) $(JFLAGS) $(CP) $*.class
-	
 
 
 #
-# CLASSES is a macro consisting of 4 words (one for each java source file)
+# FILES is a macro consisting of all files to be processed
 #
 
 FILES = \
         run.py \
+        makeAModel.py
        
 
 #
