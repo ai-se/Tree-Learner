@@ -5,7 +5,6 @@ from os import environ, getcwd
 from os import walk
 from pdb import set_trace
 import sys
-from bdb import set_trace
 
 # Update PYTHONPATH
 HOME = environ['HOME']
@@ -62,7 +61,7 @@ class run():
     self.headers = createTbl(
         self.train[
             self._n],
-        isBin=True,
+        isBin=False,
         bugThres=1).headers
 
   def categorize(self):
@@ -92,8 +91,8 @@ class run():
 
     for _ in xrange(self.reps):
       predRows = []
-      train_DF = createTbl(self.train[self._n], isBin=True)
-      test_df = createTbl(self.test[self._n], isBin=True)
+      train_DF = createTbl(self.train[self._n], isBin=False)
+      test_df = createTbl(self.test[self._n], isBin=False)
       actual = Bugs(test_df)
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
@@ -116,8 +115,7 @@ class run():
 
       self.out_pred.append(_Abcd(before=actual, after=before))
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
-      frac = sum([1 for a in after if a > 0]) / \
-          sum([1 for b in before if b > 0])
+      frac = sum(after) / sum(before)
       self.out.append(frac)
     print(self.out)
 
@@ -131,8 +129,8 @@ class run():
   def deltas(self):
     predRows = []
     delta = []
-    train_DF = createTbl(self.train[self._n], isBin=True, bugThres=1)
-    test_df = createTbl(self.test[self._n], isBin=True, bugThres=1)
+    train_DF = createTbl(self.train[self._n], isBin=False, bugThres=1)
+    test_df = createTbl(self.test[self._n], isBin=False, bugThres=1)
     before = self.pred(train_DF, test_df, tunings=self.tunedParams,
                        smoteit=True)
     allRows = np.array(
