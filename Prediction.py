@@ -76,7 +76,7 @@ def where2prd(train, test, tunings=[None, None], smoteit=False, thresh=1):
       train,
       settings=tunings[0],
       _smote=False,
-      isBin=False,
+      isBin=True,
       bugThres=2)
   test_df = createTbl(test)
   t = discreteNums(train_DF, map(lambda x: x.cells, train_DF._rows))
@@ -104,7 +104,7 @@ def _where2pred():
   train = one[0][:-1]
   # Test data
   test = [one[0][-1]]
-  actual = Bugs(createTbl(test, isBin=False))
+  actual = Bugs(createTbl(test, isBin=True))
   preds = where2prd(train, test)
   # for a, b in zip(actual, preds): print a, b
   # set_trace()
