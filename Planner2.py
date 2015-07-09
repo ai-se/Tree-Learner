@@ -48,12 +48,13 @@ class deltas():
   def createNew(self, stuff, keys, N=1):
     newElem = []
     tmpRow = self.row
-    prob = [2**-d for d in xrange(1, len(stuff)+1)]
+    prob = [2**-d for d in xrange(1, len(stuff) + 1)]
     for _ in xrange(N):
-      for s,p in zip (stuff, prob):
+      for s, p in zip(stuff, prob):
         lo, hi = s[1]
         pos = keys[s[0].name]
-        tmpRow.cells[pos] = int(not tmpRow.cells[pos]) # if uniform(0,1)>0.5 else tmpRow.cells[pos]
+        # if uniform(0,1)>0.5 else tmpRow.cells[pos]
+        tmpRow.cells[pos] = int(not tmpRow.cells[pos])
       newElem.append(tmpRow)
     return newElem
 
@@ -67,7 +68,7 @@ class deltas():
 
 
 class store():
- 
+
   def __init__(self, node):
     self.node = node
     self.dist = 0
@@ -83,7 +84,7 @@ class treatments():
   "Treatments"
 
   def __init__(self, train=None, test=None, test_DF=None,
-               verbose=True, smoteit=True, bin=True):
+               verbose=True, smoteit=True, bin=False):
     self.train, self.test = train, test
     self.train_DF = createTbl(train, _smote=smoteit, isBin=bin)
     if not test_DF:

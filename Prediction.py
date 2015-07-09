@@ -13,7 +13,7 @@ cwd = getcwd()  # Current Directory
 sys.path.extend([axe, pystat, cwd])
 from random import choice, uniform as rand
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -104,7 +104,7 @@ def _where2pred():
   train = one[0][:-1]
   # Test data
   test = [one[0][-1]]
-  actual = Bugs(createTbl(test, isBin=True))
+  actual = Bugs(createTbl(test, isBin=False))
   preds = where2prd(train, test)
   # for a, b in zip(actual, preds): print a, b
   # set_trace()
@@ -117,13 +117,13 @@ def rforest(train, test, tunings=None, smoteit=True, duplicate=True):
   if smoteit:
     train = SMOTE(train, atleast=50, atmost=101, resample=duplicate)
   if not tunings:
-    clf = RandomForestClassifier(n_estimators=100, random_state=1)
+    clf = RandomForestRegressor(n_estimators=100, random_state=1)
   else:
-    clf = RandomForestClassifier(n_estimators=int(tunings[0]),
-                                 max_features=tunings[1] / 100,
-                                 min_samples_leaf=int(tunings[2]),
-                                 min_samples_split=int(tunings[3])
-                                 )
+    clf = RandomForestRegressor(n_estimators=int(tunings[0]),
+                                max_features=tunings[1] / 100,
+                                min_samples_leaf=int(tunings[2]),
+                                min_samples_split=int(tunings[3])
+                                )
   train_DF = formatData(train)
   test_DF = formatData(test)
   features = train_DF.columns[:-2]
