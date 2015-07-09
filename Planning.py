@@ -152,7 +152,7 @@ class treatments():
         seen(node.node.branch)
     return attr
 
-  def finder2(self, node, alpha=0.5, pos='far'):
+  def finder2(self, node, alpha=0.1, pos='far'):
     """
     finder2 is a more elegant version of finder that performs a search on
     the entire tree to find leaves which are better than a certain 'node'

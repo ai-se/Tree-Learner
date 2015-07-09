@@ -224,7 +224,7 @@ def rdiv():
   for line in f:
     lst.append(striplines(line[:-1]))
 
-  rdivDemo(lst, isLatex='True')
+  rdivDemo(lst, isLatex=False)
   set_trace()
 
 
@@ -235,8 +235,9 @@ def deltaTest():
 
 
 if __name__ == '__main__':
-  _test(file='ant')
+  #   _test(file='ant')
   # deltaTest()
+  rdiv()
   # deltaCSVwriter(type='All')
 #   deltaCSVwriter(type='Indv')
 #   eval(cmd())
