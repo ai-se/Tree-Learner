@@ -235,9 +235,9 @@ def deltaTest():
 
 
 if __name__ == '__main__':
-  #   _test(file='ant')
+  _test(file='ant')
   # deltaTest()
   #   rdiv()
   # deltaCSVwriter(type='All')
-  deltaCSVwriter(type='Indv')
+#   deltaCSVwriter(type='Indv')
 #   eval(cmd())
