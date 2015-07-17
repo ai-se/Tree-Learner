@@ -65,7 +65,7 @@ class run():
         bugThres=1).headers
 
   def categorize(self):
-    dir = './Data'
+    dir = './Jureczko'
     self.projects = [Name for _, Name, __ in walk(dir)][0]
     self.numData = len(self.projects)  # Number of data
     one, two = explore(dir)
@@ -129,8 +129,8 @@ class run():
   def deltas(self):
     predRows = []
     delta = []
-    train_DF = createTbl(self.train[self._n], isBin=False, bugThres=1)
-    test_df = createTbl(self.test[self._n], isBin=False, bugThres=1)
+    train_DF = createTbl(self.train[self._n], isBin=True, bugThres=1)
+    test_df = createTbl(self.test[self._n], isBin=True, bugThres=1)
     before = self.pred(train_DF, test_df, tunings=self.tunedParams,
                        smoteit=True)
     allRows = np.array(
@@ -220,7 +220,7 @@ def rdiv():
       lists.append(float(ll))
     return lists
 
-  f = open('./data.txt')
+  f = open('./Jureczko.txt')
   for line in f:
     lst.append(striplines(line[:-1]))
 
