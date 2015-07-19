@@ -68,7 +68,7 @@ clean:
 
 git:
 	git add --all .
-	git commit -m 'Stuff...'
+	git commit -m '>>Commited using makefile<< '
 	git push
 
 pull:
