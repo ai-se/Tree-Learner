@@ -9,7 +9,7 @@ class node():
   def __init__(self, rows):
     self.rows = array([])
     for r in rows:
-      self.rows += array(r.cells)
+      self.rows.append(r.cells)
 
   def centroid(self):
     return median(self.rows)
