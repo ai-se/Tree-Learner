@@ -46,7 +46,17 @@ class contrast():
 
 
 class patches():
-  ""
+  "Apply new patch."
+
+  def __init__(self, test):
+    self.test = createTbl(test, isBin=False)
+
+  def newTable(self):
+    oldRows = self.test._rows
+    C = contrast(oldRows)
+    for r in oldRows:
+
+      pass
 
 
 class strawman():
@@ -70,14 +80,11 @@ class strawman():
   def main(self):
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
-    test_df = createTbl(test[-1], isBin=False)._rows
     clusters = [c for c in self.nodes(train_DF)]
     C = contrast(clusters)
-    for t in test_df:
-      closest = C.envy(t)
-
-      # -------- DEBUG --------
-      set_trace()
+    closest = C.envy(t)
+    # -------- DEBUG --------
+    set_trace()
 
 if __name__ == '__main__':
   strawman().main()
