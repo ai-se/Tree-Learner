@@ -2,6 +2,7 @@ from numpy import array, mean, median
 from run import run
 from pdb import set_trace
 from methods1 import createTbl
+from Prediction import rforest
 
 
 def eDist(row1, row2):
@@ -22,9 +23,9 @@ class node():
 
   def exemplar(self, what='centroid'):
     if what == 'centroid':
-      return median(array(self.rows), axis=1)
+      return median(array(self.rows), axis=0)
     elif what == 'mean':
-      return mean(array(self.rows), axis=1)
+      return mean(array(self.rows), axis=0)
 
 
 class contrast():
@@ -48,24 +49,33 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, test):
+  def __init__(self, test, clusters):
     self.test = createTbl(test, isBin=False)
+    self.clusters = clusters
+
+  def delta(self, node1, node2):
+    return [el1 - el2 for el1,
+            el2 in zip(node1.exemplar()[:-1], node2.exemplar()[:-1])]
+
+  def newRow(self, t):
+    C = contrast(self.clusters)
+    closest = C.closest(t)
+    better = C.envy(t, alpha=1)
+    D = array(self.delta(closest, better))
+    try:
+      return array(t.cells[:-2]) + D
+    except:
+      set_trace()  # Debug
 
   def newTable(self):
     oldRows = self.test._rows
-    C = contrast(oldRows)
-    for r in oldRows:
-
-      pass
+    newRows = [self.newRow(t) for t in oldRows]
 
 
 class strawman():
 
   def __init__(self):
     self.dir = './Jureczko'
-    pass
-
-  def delta(self, test):
     pass
 
   def nodes(self, rowObject):
@@ -81,8 +91,7 @@ class strawman():
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
     clusters = [c for c in self.nodes(train_DF)]
-    C = contrast(clusters)
-    closest = C.envy(t)
+    newTbl = patches(test[-1], clusters).newTable()
     # -------- DEBUG --------
     set_trace()
 
