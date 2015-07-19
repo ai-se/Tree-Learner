@@ -62,10 +62,7 @@ class patches():
     closest = C.closest(t)
     better = C.envy(t, alpha=1)
     D = array(self.delta(closest, better))
-    try:
-      return array(t.cells[:-2]) + D
-    except:
-      set_trace()  # Debug
+    return (array(t.cells[:-2]) + D).tolist()
 
   def newTable(self):
     oldRows = self.test._rows
