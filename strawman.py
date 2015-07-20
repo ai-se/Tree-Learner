@@ -94,7 +94,7 @@ class patches():
     "Changes"
     header = array([h.name[1:] for h in self.test.headers[:-2]])
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
-    delta = array([self.delta(t) for t in oldRows])
+    delta = array([self.delta(t, prune=True) for t in oldRows])
     y = median(delta, axis=0)
     yhi, ylo = percentile(delta, q=[75, 25], axis=0)
     dat1 = sorted([(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)]
