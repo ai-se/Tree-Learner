@@ -65,7 +65,7 @@ class patches():
   def delta0(self, node1, node2):
     return array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
-                              , node2.exemplar()[:-1])])/self.min_max()
+                              , node2.exemplar()[:-1])])/min_max()
 
   def delta(self, t):
     C = contrast(self.clusters)
