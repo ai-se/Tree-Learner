@@ -11,14 +11,6 @@ def eDist(row1, row2):
   "Euclidean Distance"
   return sum([(a * a - b * b)**0.5 for a, b in zip(row1[:-1], row2[:-1])])
 
-def fWeight(self, criterion='Variance'):
-  lbs = W(use=criterion).weights(self.train_df)
-  sortedLbs = sorted([l / max(lbs[0]) for l in lbs[0]], reverse=True)
-  indx = int(self.infoPrune * len(sortedLbs)) - 1 if self.Prune else -1
-  cutoff = sortedLbs[indx]
-  L = [l / max(lbs[0]) for l in lbs[0]]
-  return [0 if l < cutoff else l for l in L] if self.Prune else L
-
 class node():
   """
   A data structure to hold all the rows in a cluster.
@@ -58,11 +50,13 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, train, test, clusters):
+  def __init__(self, train, test, clusters, prune=True, B=0.33):
     self.train = createTbl(train, isBin=True) 
     self.test = createTbl(test, isBin=True)
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
+    self.Prune = prune
+    self.B = B
 
   def min_max(self):
     allRows = array(map(lambda Rows: array(Rows.cells[:-2])
@@ -71,27 +65,28 @@ class patches():
     base = lambda X: sorted(X)[-1] - sorted(X)[0]
     return array([base([r[i] for r in allRows]) for i in xrange(N)])
 
-  def delta0(self, node1, node2, prune):
-    if prune:
 
-      all = array([el1 - el2 for el1
-                 , el2 in zip(node1.exemplar()[:-1]
-                              , node2.exemplar()[:-1])])/self.min_max()
-      M = array([1 if i < 0.33*size(all) else 0 for i in xrange(size(all))])
-      return all*M
-    else: 
-      return array([el1 - el2 for el1
-                 , el2 in zip(node1.exemplar()[:-1]
-                              , node2.exemplar()[:-1])])/self.min_max()
+  def fWeight(self, criterion='Variance'):
+    lbs = W(use=criterion).weights(self.train)
+    sortedLbs = sorted([l / max(lbs[0]) for l in lbs[0]], reverse=True)
+    indx = int(self.B * len(sortedLbs)) - 1 if self.Prune else -1
+    cutoff = sortedLbs[indx]
+    L = [l / max(lbs[0]) for l in lbs[0]]
+    return [0 if l < cutoff else l for l in L] if self.Prune else L
 
-  def delta(self, t, prune):
+  def delta0(self, node1, node2):
+    return = array([el1 - el2 for el1
+                 , el2 in zip(node1.exemplar()[:-1]
+                     , node2.exemplar()[:-1])])/self.min_max()*self.fWeight()
+
+  def delta(self, t):
     C = contrast(self.clusters)
     closest = C.closest(t)
     better = C.envy(t, alpha=1)
-    return self.delta0(closest, better, prune)
+    return self.delta0(closest, better)
 
-  def patchIt(self, t, prune=True):
-    return (array(t.cells[:-2]) + self.delta(t, prune)).tolist()
+  def patchIt(self, t):
+    return (array(t.cells[:-2]) + self.delta(t)).tolist()
 
   def newTable(self):
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
@@ -102,7 +97,7 @@ class patches():
     "Changes"
     header = array([h.name[1:] for h in self.test.headers[:-2]])
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
-    delta = array([self.delta(t, prune=True) for t in oldRows])
+    delta = array([self.delta(t) for t in oldRows])
     y = median(delta, axis=0)
     yhi, ylo = percentile(delta, q=[75, 25], axis=0)
     dat1 = sorted([(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)]
