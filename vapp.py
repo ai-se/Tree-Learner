@@ -42,10 +42,11 @@ from table import clone
 
 
 def write2file(data, fname='Untitled', ext='.txt'):
-  with open(fname+ext, 'w') as fwrite:
+  with open(fname + ext, 'w') as fwrite:
     writer = csv.writer(fwrite, delimiter=',')
-    for b in data: 
+    for b in data:
       writer.writerow(b)
+
 
 class predictor():
 
@@ -111,7 +112,7 @@ class predictor():
 
 class fileHandler():
 
-  def __init__(self, dir='./CPM/'):
+  def __init__(self, dir='./Seigmund/'):
     self.dir = dir
 
   def reformat(self, file, train_test=True, ttr=0.5, save=False):
@@ -138,14 +139,14 @@ class fileHandler():
           writer.writerow(b)
     elif train_test:
       # call(["mkdir", "./Data/" + file[:-7]], stdout=PIPE)
-      with open("./DataCPM/" + file[:-7] + '/Train.csv', 'w+') as fwrite:
+      with open("./SeigmundTT/" + file[:-7] + '/Train.csv', 'w+') as fwrite:
         writer = csv.writer(fwrite, delimiter=',')
         train = sample(body, int(ttr * len(body)))
         writer.writerow(header)
         for b in train:
           writer.writerow(b)
 
-      with open("./DataCPM/" + file[:-7] + '/Test.csv', 'w+') as fwrite:
+      with open("./SeigmundTT/" + file[:-7] + '/Test.csv', 'w+') as fwrite:
         writer = csv.writer(fwrite, delimiter=',')
         test = [b for b in body if not b in train]
         writer.writerow(header)
@@ -173,7 +174,7 @@ class fileHandler():
         self.reformat(f)
     datasets = []
     projects = {}
-    for (dirpath, dirnames, filenames) in walk(cwd + '/DataCPM/'):
+    for (dirpath, dirnames, filenames) in walk(cwd + '/SeigmundTT/'):
       if name in dirpath:
         datasets.append([dirpath, filenames])
     return datasets
@@ -189,8 +190,8 @@ class fileHandler():
 #     return files, [self.file2pandas(dir + file) for file in files]
 
   def planner(self, train, test):
-    train_df = formatData(createTbl(train,_smote=False, isBin=False))
-    test_df = formatData(createTbl(test,_smote=False, isBin=False))
+    train_df = formatData(createTbl(train, _smote=False, isBin=False))
+    test_df = formatData(createTbl(test, _smote=False, isBin=False))
     actual = test_df[
         test_df.columns[-2]].astype('float32').tolist()
     before = predictor(train=train_df, test=test_df).rforest()
@@ -207,11 +208,12 @@ class fileHandler():
     for line1, line2 in zip(before, after):
       row1 = np.array([float(l) for l in line1.strip().split(',')])
       row2 = np.array([float(l) for l in line2.strip().split(',')])
-      try: yield np.bitwise_xor(row2,row1,dtype='int')
-      except: set_trace()
+      try:
+        yield np.bitwise_xor(row2, row1, dtype='int')
+      except:
+        set_trace()
 
-
-  def deltas(self,name):
+  def deltas(self, name):
     predRows = []
     delta = []
     data = self.explorer(name)
@@ -222,19 +224,32 @@ class fileHandler():
         train_DF = createTbl(train, isBin=False)
         test_df = createTbl(test, isBin=False)
         self.headers = train_DF.headers
-        write2file(map(lambda r: r.cells[:-2], test_df._rows), fname='before_cpm') # save file
-        
+        write2file(
+            map(
+                lambda r: r.cells[
+                    :-2],
+                test_df._rows),
+            fname='before_cpm')  # save file
+
         """
         Apply Learner
-        """    
-        for _ in xrange(1):
-          newTab = treatments(train=train, test=test
-          , smoteit=False, bin=False).main()
-          write2file(map(lambda r: r.cells[:-2], newTab._rows), fname='after_cpm') # save file
+        """
+        for _ in xrange(10):
+          newTab = treatments(
+              train=train,
+              test=test,
+              smoteit=False,
+              bin=False).main()
+          write2file(
+              map(
+                  lambda r: r.cells[
+                      :-2],
+                  newTab._rows),
+              fname='after_cpm')  # save file
           delta.append([d for d in self.delta0()])
-        
-        return np.array(np.sum(delta[0], axis=0), dtype='float')/np.size(delta[0], axis=0)
 
+        return np.array(
+            np.sum(delta[0], axis=0), dtype='float') / np.size(delta[0], axis=0)
 
   def flatten(self, x):
     """
@@ -276,7 +291,7 @@ class fileHandler():
 def deltasTester(name):
   # print('##', name)
   f = fileHandler()
-  delta=[f.deltas(name) for _ in xrange(24)]
+  delta = [f.deltas(name) for _ in xrange(24)]
   y = np.median(delta, axis=0)
   yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
   dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
@@ -287,6 +302,7 @@ def deltasTester(name):
     writer = csv.writer(csvfile, delimiter=' ')
     for el in dat[()]:
       writer.writerow(el)
+
 
 def rdiv():
   lst = []
@@ -303,27 +319,26 @@ def rdiv():
   for line in f:
     lst.append(striplines(line[:-1]))
 
-  rdivDemo(lst)
-  set_trace()
-
+  rdivDemo(lst, isLatex=False)
+#   set_trace()
 
 
 def _test(name='Apache', doWhat='Accuracy'):
   Accuracy = []
   Gain = []
   medianDelta = []
-  a, b, c = fileHandler().main(name, reps=1)
+  a, b, c = fileHandler().main(name, reps=10)
   if doWhat == 'AUC':
     print(b)
   elif doWhat == 'Median':
     print(c)
 
 if __name__ == '__main__':
- 
-  # rdiv()
+
+  rdiv()
   #   _testPlot()
   #  _test('BDBC', 'Median')
-  for name in ['Apache', 'BDBJ', 'LLVM', 'X264']:
+  for name in ['BDBC']:
     # deltasTester(name)
     _test(name=name, doWhat='AUC')
 #   eval(cmd())

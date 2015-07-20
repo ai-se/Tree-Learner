@@ -17,9 +17,11 @@ cwd = getcwd()  # Current Directory
 sys.path.extend([axe, pystat, cwd])
 from table import clone
 
+
 def eDist(row1, row2):
   "Euclidean Distance"
   return sum([(a * a - b * b)**0.5 for a, b in zip(row1[:-1], row2[:-1])])
+
 
 class node():
   """
@@ -60,8 +62,9 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, train, test, clusters, prune=True, B=0.33, verbose=False):
-    self.train = createTbl(train, isBin=True) 
+  def __init__(
+          self, train, test, clusters, prune=False, B=0.33, verbose=False):
+    self.train = createTbl(train, isBin=True)
     self.test = createTbl(test, isBin=True)
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
@@ -71,12 +74,17 @@ class patches():
     self.write = verbose
 
   def min_max(self):
-    allRows = array(map(lambda Rows: array(Rows.cells[:-2])
-                       , self.train._rows + self.test._rows))
+    allRows = array(
+        map(
+            lambda Rows: array(
+                Rows.cells[
+                    :-
+                    2]),
+            self.train._rows +
+            self.test._rows))
     N = len(allRows[0])
     base = lambda X: sorted(X)[-1] - sorted(X)[0]
     return array([base([r[i] for r in allRows]) for i in xrange(N)])
-
 
   def fWeight(self, criterion='Variance'):
     lbs = W(use=criterion).weights(self.train)
@@ -87,9 +95,8 @@ class patches():
     return array([0 if l < cutoff else l for l in L] if self.Prune else L)
 
   def delta0(self, node1, node2):
-    return array([el1 - el2 for el1
-                 , el2 in zip(node1.exemplar()[:-1]
-                     , node2.exemplar()[:-1])])/self.min_max()*self.mask
+    return array([el1 - el2 for el1, el2 in zip(node1.exemplar()
+                                                [:-1], node2.exemplar()[:-1])]) / self.min_max() * self.mask
 
   def delta(self, t):
     C = contrast(self.clusters)
@@ -101,7 +108,7 @@ class patches():
     return (array(t.cells[:-2]) + self.delta(t)).tolist()
 
   def newTable(self):
-    oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
+    oldRows = [r for r, p in zip(self.test._rows, self.pred) if p > 0]
     newRows = [self.patchIt(t) for t in oldRows]
     if self.write:
       self.deltasCSVWriter()
@@ -111,21 +118,21 @@ class patches():
       writer = csv.writer(csvfile, delimiter=',')
       writer.writerow(header)
       for el in newRows:
-        writer.writerow(el+[0])
-    
+        writer.writerow(el + [0])
+
     return createTbl(['tmp.csv'])
 
   def deltasCSVWriter(self, name='ant'):
     "Changes"
     header = array([h.name[1:] for h in self.test.headers[:-2]])
-    oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
+    oldRows = [r for r, p in zip(self.test._rows, self.pred) if p > 0]
     delta = array([self.delta(t) for t in oldRows])
     y = median(delta, axis=0)
     yhi, ylo = percentile(delta, q=[75, 25], axis=0)
-    dat1 = sorted([(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)]
-                  , key=lambda F: F[1])
+    dat1 = sorted(
+        [(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)], key=lambda F: F[1])
     dat = asarray([(d[0], n, d[1], d[2], d[3])
-                      for d, n in zip(dat1, range(1, 21))])
+                   for d, n in zip(dat1, range(1, 21))])
     with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
       writer = csv.writer(csvfile, delimiter=' ')
       for el in dat[()]:
@@ -135,10 +142,10 @@ class patches():
 
 class strawman():
 
-  def __init__(self, name = "ant"):
+  def __init__(self, name="ant"):
     self.dir = './Jureczko'
     self.name = name
-    self.E = [name+' Baseline (Prune)']
+    self.E = [name + ' Baseline (Prune)']
 
   def nodes(self, rowObject):
     clusters = set([r.cells[-1] for r in rowObject])
@@ -154,13 +161,14 @@ class strawman():
     train_DF = createTbl(train[-1], isBin=True)
     test_DF = createTbl(test[-1], isBin=True)
     before = rforest(train=train_DF, test=test_DF)
-    for _ in xrange(8):
+    for _ in xrange(1):
       clstr = [c for c in self.nodes(train_DF._rows)]
-      newTbl = patches(train=train[-1], test=test[-1]
-                       , clusters=clstr).newTable()
-      after = rforest(train=train_DF, test=newTbl)
-      self.E.append(sum(after)/sum(before))
-    print(self.E)
+      newTbl = patches(train=train[-1],
+                       test=test[-1],
+                       clusters=clstr).deltasCSVWriter(name=self.name)
+#       after = rforest(train=train_DF, test=newTbl)
+#       self.E.append(sum(after) / sum(before))
+#     print(self.E)
     # # -------- DEBUG --------
     # set_trace()
 

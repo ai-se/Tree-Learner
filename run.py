@@ -173,7 +173,7 @@ class run():
 
 
 def _test(file='ant'):
-  for file in ['lucene', 'jedit']:
+  for file in ['ivy', 'poi', 'ant']:
     print('##', file)
     R = run(dataName=file, reps=10).go()
 
@@ -182,7 +182,7 @@ def deltaCSVwriter(type='Indv'):
   if type == 'Indv':
     for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
       print('##', name)
-      delta = run(dataName=name, reps=10).deltas()
+      delta = run(dataName=name, reps=4).deltas()
       y = np.median(delta, axis=0)
       yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
       dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
@@ -197,7 +197,7 @@ def deltaCSVwriter(type='Indv'):
     delta = []
     for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
       print('##', name)
-      delta.extend(run(dataName=name, reps=10).deltas())
+      delta.extend(run(dataName=name, reps=4).deltas())
     y = np.median(delta, axis=0)
     yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
     dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
@@ -221,7 +221,7 @@ def rdiv():
       lists.append(float(ll))
     return lists
 
-  f = open('./ant.dat')
+  f = open('./jedit.dat')
   for line in f:
     lst.append(striplines(line[:-1]))
 
@@ -236,9 +236,9 @@ def deltaTest():
 
 
 if __name__ == '__main__':
-  _test(file='ant')
+  #   _test(file='ant')
   # deltaTest()
-#   rdiv()
-  # deltaCSVwriter(type='All')
+  #   rdiv()
+  deltaCSVwriter(type='All')
 #   deltaCSVwriter(type='Indv')
 #   eval(cmd())
