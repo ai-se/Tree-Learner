@@ -79,7 +79,7 @@ class store():
   def scorer(self, node):
     if self.majority:
       count = dict(Counter([r.cells[-1] for r in node.rows]))
-      id = sorted([k for k in count], key=lambda F: count[k])[-1]
+      id = sorted([k for k in count], key=lambda F: count[k])
       set_trace()
     else:
       return mean([r.cells[-2] for r in node.rows])

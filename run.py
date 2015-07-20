@@ -91,8 +91,8 @@ class run():
 
     for _ in xrange(self.reps):
       predRows = []
-      train_DF = createTbl(self.train[self._n], isBin=True)
-      test_df = createTbl(self.test[self._n], isBin=True)
+      train_DF = createTbl(self.train[self._n], isBin=False)
+      test_df = createTbl(self.test[self._n], isBin=False)
       actual = Bugs(test_df)
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
@@ -100,7 +100,7 @@ class run():
 
       for predicted, row in zip(before, test_df._rows):
         tmp = row.cells
-        tmp[-2] = predicted
+#         tmp[-2] = row.cells
         if predicted > 0:
           predRows.append(tmp)
 
@@ -115,7 +115,8 @@ class run():
 
       self.out_pred.append(_Abcd(before=actual, after=before))
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
-      frac = sum(after) / sum(before)
+      frac = sum([1 if a > 0 else 0 for a in after]) / \
+          sum([1 if b > 0 else 0 for b in before])
       self.out.append(frac)
     print(self.out)
 
