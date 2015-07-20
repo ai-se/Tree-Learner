@@ -73,12 +73,12 @@ class patches():
 
   def deltas(self):
     "Changes"
-    header = array([h[1:] for h in self.test.headers])
+    header = array([h.name[1:] for h in self.test.headers[:-2]])
     delta = array([self.delta(t) for t in self.test._rows])
     y = median(delta, axis=0)
-    yhi, ylo = np.percentile(delta, q=[75, 25], axis=0)
-    dat1 = sorted([(h.name[1:], a, b, c) for h, a, b, c in zip(
-        run(dataName=name).headers[:-2], y, ylo, yhi)], key=lambda F: F[1])
+    yhi, ylo = percentile(delta, q=[75, 25], axis=0)
+    dat1 = sorted([(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)]
+                  , key=lambda F: F[1])
     dat = np.asarray([(d[0], n, d[1], d[2], d[3])
                       for d, n in zip(dat1, range(1, 21))])
     with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
