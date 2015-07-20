@@ -56,7 +56,7 @@ class patches():
     self.clusters = clusters
 
   def min_max(self):
-    allRows = np.array(map(lambda Rows: np.array(Rows.cells[:-1])
+    allRows = array(map(lambda Rows: np.array(Rows.cells[:-1])
                        , self.train_rows + self.test._rows))
     N = len(allRows[0])
     base = lambda X: sorted(X)[-1] - sorted(X)[0]
