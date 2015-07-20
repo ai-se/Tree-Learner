@@ -4,11 +4,20 @@ from run import run
 from pdb import set_trace
 from methods1 import createTbl
 from Prediction import rforest
+from weights import weights as W
 
 
 def eDist(row1, row2):
   "Euclidean Distance"
   return sum([(a * a - b * b)**0.5 for a, b in zip(row1[:-1], row2[:-1])])
+
+def fWeight(self, criterion='Variance'):
+  lbs = W(use=criterion).weights(self.train_df)
+  sortedLbs = sorted([l / max(lbs[0]) for l in lbs[0]], reverse=True)
+  indx = int(self.infoPrune * len(sortedLbs)) - 1 if self.Prune else -1
+  cutoff = sortedLbs[indx]
+  L = [l / max(lbs[0]) for l in lbs[0]]
+  return [0 if l < cutoff else l for l in L] if self.Prune else L
 
 class node():
   """
@@ -64,6 +73,7 @@ class patches():
 
   def delta0(self, node1, node2, prune):
     if prune:
+
       all = array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
                               , node2.exemplar()[:-1])])/self.min_max()
