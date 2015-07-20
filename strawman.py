@@ -110,7 +110,7 @@ class strawman():
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
     clusters = [c for c in self.nodes(train_DF)]
-    newTbl = patches(train[-1], test[-1], clusters).newTable()
+    newTbl = patches(train[-1], test[-1], clusters).deltas()
     # -------- DEBUG --------
     set_trace()
 
