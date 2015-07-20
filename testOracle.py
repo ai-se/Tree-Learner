@@ -105,7 +105,7 @@ class testOracle():
     print("Bugs, Pd, Pf")
     try:
       for k in ABCD(before=actual, after=predicted).all():
-        print((%d, %0.2f, %0.2f)%(k.indx, k.stats()[0], k.stats()[1]))
+        print('%d, %0.2f, %0.2f'%(k.indx, k.stats()[0], k.stats()[1]))
     except:
       pass
     #   # ---------- DEBUG ----------
