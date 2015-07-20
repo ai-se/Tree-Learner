@@ -18,6 +18,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+from collections import Counter
+
 from Prediction import *
 from _imports import *
 from abcd import _Abcd
@@ -40,11 +42,9 @@ class deltas():
     self.loc = drop(row, myTree)
     self.contrastSet = None
     self.newRow = row
-    self.majority = majority
     self.score = self.scorer(self.loc)
 
   def scorer(self, node):
-
     return mean([r.cells[-2] for r in node.rows])
 
   def createNew(self, stuff, keys, N=1):
@@ -69,14 +69,19 @@ class deltas():
 
 class store():
 
-  def __init__(self, node):
+  def __init__(self, node, majority=True):
     self.node = node
     self.dist = 0
     self.DoC = 0
+    self.majority = majority
     self.score = self.scorer(node)
 
   def scorer(self, node):
-    return mean([r.cells[-2] for r in node.rows])
+    if self.majority:
+      count = Counter([r.cells[-1] for r in node.rows])
+      set_trace()
+    else:
+      return mean([r.cells[-2] for r in node.rows])
 
 
 class treatments():
