@@ -1,5 +1,5 @@
 import csv
-from numpy import array, asarray, mean, median, percentile
+from numpy import array, asarray, mean, median, percentile, size
 from run import run
 from pdb import set_trace
 from methods1 import createTbl
@@ -62,23 +62,32 @@ class patches():
     base = lambda X: sorted(X)[-1] - sorted(X)[0]
     return array([base([r[i] for r in allRows]) for i in xrange(N)])
 
-  def delta0(self, node1, node2):
+  def delta0(self, node1, node2, prune):
+    if prune:
+      all = array([el1 - el2 for el1
+                 , el2 in zip(node1.exemplar()[:-1]
+                              , node2.exemplar()[:-1])])/self.min_max()
+      mask = array([1 if i < 0.33*size(all
+                                 , axis=1) else 0 for i in xrange(size(all
+                                                                  , axis=1))])
+      return all*mask
+    else 
     return array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
                               , node2.exemplar()[:-1])])/self.min_max()
 
-  def delta(self, t):
+  def delta(self, t, prune):
     C = contrast(self.clusters)
     closest = C.closest(t)
     better = C.envy(t, alpha=1)
-    return self.delta0(closest, better)
+    return self.delta0(closest, better, prune)
 
-  def newRow(self, t):
-    return (array(t.cells[:-2]) + self.delta(t)).tolist()
+  def patchIt(self, t, prune=True):
+    return (array(t.cells[:-2]) + self.delta(t, prune)).tolist()
 
   def newTable(self):
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
-    newRows = [self.newRow(t) for t in oldRows]
+    newRows = [self.patchIt(t) for t in oldRows]
     return clone(self.test, rows=newRows)
 
   def deltasCSVWriter(self, name='ant'):
