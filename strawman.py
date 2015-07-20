@@ -49,7 +49,7 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, test, clusters):
+  def __init__(self, train, test, clusters):
     self.train = createTbl(train, isBin=True) 
     self.test = createTbl(test, isBin=True)
     self.pred = rforest(train, test, smoteit=True, duplicate=True)
@@ -109,8 +109,8 @@ class strawman():
   def main(self):
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
-    clusters = [c for c in self.nodes(train_DF)]
-    newTbl = patches(train[-1], test[-1], clusters).deltas()
+    clstr = [c for c in self.nodes(train_DF)]
+    newTbl = patches(train=train[-1], test=test[-1], clusters=clstr).deltas()
     # -------- DEBUG --------
     set_trace()
 
