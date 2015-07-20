@@ -55,15 +55,23 @@ class patches():
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
 
+  def min_max():
+    allRows = np.array(map(lambda Rows: np.array(Rows.cells[:-1])
+                       , self.train_rows + self.test._rows))
+    N = len(allRows[0])
+    base = lambda X: sorted(X)[-1] - sorted(X)[0]
+    return array([base([r[i] for r in allRows]) for i in xrange(N)])
+
   def delta0(self, node1, node2):
-    return [el1 - el2 for el1,
-            el2 in zip(node1.exemplar()[:-1], node2.exemplar()[:-1])]
+    return array([el1 - el2 for el1
+                 , el2 in zip(node1.exemplar()[:-1]
+                              , node2.exemplar()[:-1])])/self.min_max()
 
   def delta(self, t):
     C = contrast(self.clusters)
     closest = C.closest(t)
     better = C.envy(t, alpha=1)
-    return array(self.delta0(closest, better))
+    return self.delta0(closest, better)
 
   def newRow(self, t):
     return (array(t.cells[:-2]) + self.delta(t)).tolist()
@@ -73,7 +81,7 @@ class patches():
     newRows = [self.newRow(t) for t in oldRows]
     return clone(self.test, rows=newRows)
 
-  def deltas(self, name='ant'):
+  def deltasCSVWriter(self, name='ant'):
     "Changes"
     header = array([h.name[1:] for h in self.test.headers[:-2]])
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
