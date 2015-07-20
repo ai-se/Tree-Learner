@@ -1,5 +1,5 @@
 import csv
-from numpy import array, mean, median, percentile
+from numpy import array, asarray, mean, median, percentile
 from run import run
 from pdb import set_trace
 from methods1 import createTbl
@@ -82,7 +82,7 @@ class patches():
     yhi, ylo = percentile(delta, q=[75, 25], axis=0)
     dat1 = sorted([(h, a, b, c) for h, a, b, c in zip(header, y, ylo, yhi)]
                   , key=lambda F: F[1])
-    dat = np.asarray([(d[0], n, d[1], d[2], d[3])
+    dat = asarray([(d[0], n, d[1], d[2], d[3])
                       for d, n in zip(dat1, range(1, 21))])
     with open('/Users/rkrsn/git/GNU-Plots/rkrsn/errorbar/%s.csv' % (name), 'w') as csvfile:
       writer = csv.writer(csvfile, delimiter=' ')
