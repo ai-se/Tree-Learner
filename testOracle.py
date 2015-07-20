@@ -103,15 +103,16 @@ class testOracle():
     actual = Bugs(self.test)
     predicted = rforest(self.train, self.test, tunings=self.param, smoteit=True)
     print("Bugs, Pd, Pf")
-    # try:
-    for k in ABCD(before=actual, after=predicted).all():
-      print(k.indx, k.stats()[0], k.stats()[1])
-    # except:
+    try:
+      for k in ABCD(before=actual, after=predicted).all():
+        print((%d, %0.2f, %0.2f)%(k.indx, k.stats()[0], k.stats()[1]))
+    except:
+      pass
     #   # ---------- DEBUG ----------
     #   set_trace()
 
 if __name__=="__main__":
-  for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+  for name in ['jedit', 'lucene', 'poi', 'ant']:
     print('### '+ name)
     testOracle(file='ant').main()
 
