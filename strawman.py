@@ -71,8 +71,8 @@ class patches():
                                  , axis=1) else 0 for i in xrange(size(all
                                                                   , axis=1))])
       return all*mask
-    else 
-    return array([el1 - el2 for el1
+    else: 
+      return array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
                               , node2.exemplar()[:-1])])/self.min_max()
 
