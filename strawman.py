@@ -57,7 +57,7 @@ class patches():
 
   def min_max(self):
     allRows = array(map(lambda Rows: np.array(Rows.cells[:-1])
-                       , self.train_rows + self.test._rows))
+                       , self.train._rows + self.test._rows))
     N = len(allRows[0])
     base = lambda X: sorted(X)[-1] - sorted(X)[0]
     return array([base([r[i] for r in allRows]) for i in xrange(N)])
