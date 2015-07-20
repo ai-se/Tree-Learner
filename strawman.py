@@ -55,7 +55,7 @@ class patches():
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
 
-  def min_max():
+  def min_max(self):
     allRows = np.array(map(lambda Rows: np.array(Rows.cells[:-1])
                        , self.train_rows + self.test._rows))
     N = len(allRows[0])
@@ -65,7 +65,7 @@ class patches():
   def delta0(self, node1, node2):
     return array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
-                              , node2.exemplar()[:-1])])/min_max()
+                              , node2.exemplar()[:-1])])/self.min_max()
 
   def delta(self, t):
     C = contrast(self.clusters)
