@@ -5,7 +5,13 @@ from pdb import set_trace
 from methods1 import createTbl
 from Prediction import rforest
 from weights import weights as W
-
+# Update PYTHONPATH
+HOME = environ['HOME']
+axe = HOME + '/git/axe/axe/'  # AXE
+pystat = HOME + '/git/pystats/'  # PySTAT
+cwd = getcwd()  # Current Directory
+sys.path.extend([axe, pystat, cwd])
+from table import clone
 
 def eDist(row1, row2):
   "Euclidean Distance"
