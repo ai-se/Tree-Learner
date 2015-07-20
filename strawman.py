@@ -134,7 +134,7 @@ class strawman():
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=True)
     test_DF = createTbl(test[-1], isBin=True)
-    before = rforest(train=train_DF, test=test)
+    before = rforest(train=train_DF, test=test_DF)
     clstr = [c for c in self.nodes(train_DF._rows)]
     newTbl = patches(train=train[-1], test=test[-1]
                      , clusters=clstr).newTable()
