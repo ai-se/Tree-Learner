@@ -55,7 +55,7 @@ class patches():
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
 
-  def delta(self, node1, node2):
+  def delta0(self, node1, node2):
     return [el1 - el2 for el1,
             el2 in zip(node1.exemplar()[:-1], node2.exemplar()[:-1])]
 
@@ -63,7 +63,7 @@ class patches():
     C = contrast(self.clusters)
     closest = C.closest(t)
     better = C.envy(t, alpha=1)
-    return array(self.delta(closest, better))
+    return array(self.delta0(closest, better))
 
   def newRow(self, t):
     return (array(t.cells[:-2]) + self.delta(t)).tolist()
