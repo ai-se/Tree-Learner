@@ -91,8 +91,8 @@ class run():
 
     for _ in xrange(self.reps):
       predRows = []
-      train_DF = createTbl(self.train[self._n], isBin=False)
-      test_df = createTbl(self.test[self._n], isBin=False)
+      train_DF = createTbl(self.train[self._n], isBin=True)
+      test_df = createTbl(self.test[self._n], isBin=True)
       actual = Bugs(test_df)
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
@@ -133,7 +133,14 @@ class run():
     test_df = createTbl(self.test[self._n], isBin=True, bugThres=1)
     before = self.pred(train_DF, test_df, tunings=self.tunedParams,
                        smoteit=True)
-    allRows = np.array(map(lambda Rows: np.array(Rows.cells[:-1]), train_DF._rows + test_df._rows))
+    allRows = np.array(
+        map(
+            lambda Rows: np.array(
+                Rows.cells[
+                    :-
+                    1]),
+            train_DF._rows +
+            test_df._rows))
 
     def min_max():
       N = len(allRows[0])
