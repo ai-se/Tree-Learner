@@ -76,10 +76,25 @@ class store():
     self.majority = majority
     self.score = self.scorer(node)
 
+  def minority(self, node):
+    unique = list(set([r.cells[-1] for r in node.rows]))
+    counts = len(unique) * [0]
+#     set_trace()
+    for n in xrange(len(unique)):
+      for d in [r.cells[-1] for r in node.rows]:
+        if unique[n] == d:
+          counts[n] += 1
+    return unique, counts
+
   def scorer(self, node):
     if self.majority:
-      count = dict(Counter([r.cells[-1] for r in node.rows]))
-      id = sorted([k for k in count], key=lambda F: count[k])
+      unq, counts = self.minority(node)
+      id, maxel = 0, 0
+      for i, el in enumerate(counts):
+        if el > maxel:
+          maxel = el
+          id = i
+      return mean([r.cells[-2] for r in node.rows if r.cells[-1] == id])
       set_trace()
     else:
       return mean([r.cells[-2] for r in node.rows])
