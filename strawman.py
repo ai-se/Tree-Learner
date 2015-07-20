@@ -57,6 +57,7 @@ class patches():
     self.clusters = clusters
     self.Prune = prune
     self.B = B
+    self.mask = self.fWeight()
 
   def min_max(self):
     allRows = array(map(lambda Rows: array(Rows.cells[:-2])
@@ -72,12 +73,12 @@ class patches():
     indx = int(self.B * len(sortedLbs)) - 1 if self.Prune else -1
     cutoff = sortedLbs[indx]
     L = [l / max(lbs[0]) for l in lbs[0]]
-    return [0 if l < cutoff else l for l in L] if self.Prune else L
+    return array([0 if l < cutoff else l for l in L] if self.Prune else L)
 
   def delta0(self, node1, node2):
-    return = array([el1 - el2 for el1
+    return array([el1 - el2 for el1
                  , el2 in zip(node1.exemplar()[:-1]
-                     , node2.exemplar()[:-1])])/self.min_max()*self.fWeight()
+                     , node2.exemplar()[:-1])])/self.min_max()*self.mask
 
   def delta(self, t):
     C = contrast(self.clusters)
