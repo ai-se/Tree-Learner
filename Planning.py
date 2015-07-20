@@ -35,14 +35,16 @@ import sk
 
 class deltas():
 
-  def __init__(self, row, myTree):
+  def __init__(self, row, myTree, majority=True):
     self.row = row
     self.loc = drop(row, myTree)
     self.contrastSet = None
     self.newRow = row
+    self.majority = majority
     self.score = self.scorer(self.loc)
 
   def scorer(self, node):
+
     return mean([r.cells[-2] for r in node.rows])
 
   def createNew(self, stuff, keys, N=1):
