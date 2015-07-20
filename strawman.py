@@ -50,7 +50,7 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, train, test, clusters, prune=True, B=0.33):
+  def __init__(self, train, test, clusters, prune=True, B=0.33, verbose=True):
     self.train = createTbl(train, isBin=True) 
     self.test = createTbl(test, isBin=True)
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
@@ -58,6 +58,7 @@ class patches():
     self.Prune = prune
     self.B = B
     self.mask = self.fWeight()
+    self.write = verbose
 
   def min_max(self):
     allRows = array(map(lambda Rows: array(Rows.cells[:-2])
@@ -92,6 +93,8 @@ class patches():
   def newTable(self):
     oldRows = [r for r, p in zip(self.test._rows, self.pred) if p>0]
     newRows = [self.patchIt(t) for t in oldRows]
+    if self.write:
+      self.deltasCSVWriter()
     return clone(self.test, rows=newRows)
 
   def deltasCSVWriter(self, name='ant'):
@@ -129,10 +132,14 @@ class strawman():
 
   def main(self):
     train, test = run(dataName='ant').categorize()
-    train_DF = createTbl(train[-1], isBin=False)._rows
-    clstr = [c for c in self.nodes(train_DF)]
+    train_DF = createTbl(train[-1], isBin=True)
+    test_DF = createTbl(test[-1], isBin=True)
+    before = rforest(train=train_DF, test=test)
+    clstr = [c for c in self.nodes(train_DF._rows)]
     newTbl = patches(train=train[-1], test=test[-1]
-                     , clusters=clstr).deltasCSVWriter()
+                     , clusters=clstr).newTable()
+    after = rforest(train=train_DF, test=newTbl)
+
     # -------- DEBUG --------
     set_trace()
 
