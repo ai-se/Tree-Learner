@@ -103,7 +103,15 @@ class patches():
     newRows = [self.patchIt(t) for t in oldRows]
     if self.write:
       self.deltasCSVWriter()
-    return clone(self.test, rows=newRows)
+
+    header = [h.name for h in self.test.headers[:-1]]
+    with open('tmp.csv', 'w') as csvfile:
+      writer = csv.writer(csvfile, delimiter=' ')
+      writer.writerow(header)
+      for el in newRows:
+        writer.writerow(el+[None])
+    
+    return createTbl('tmp.csv')
 
   def deltasCSVWriter(self, name='ant'):
     "Changes"
