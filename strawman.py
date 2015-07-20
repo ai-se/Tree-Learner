@@ -52,7 +52,7 @@ class patches():
   def __init__(self, train, test, clusters):
     self.train = createTbl(train, isBin=True) 
     self.test = createTbl(test, isBin=True)
-    self.pred = rforest(train, test, smoteit=True, duplicate=True)
+    self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
     self.clusters = clusters
 
   def delta(self, node1, node2):
