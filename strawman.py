@@ -60,7 +60,7 @@ class contrast():
 class patches():
   "Apply new patch."
 
-  def __init__(self, train, test, clusters, prune=True, B=0.33, verbose=True):
+  def __init__(self, train, test, clusters, prune=True, B=0.33, verbose=False):
     self.train = createTbl(train, isBin=True) 
     self.test = createTbl(test, isBin=True)
     self.pred = rforest(self.train, self.test, smoteit=True, duplicate=True)
@@ -138,7 +138,7 @@ class strawman():
   def __init__(self, name = "ant"):
     self.dir = './Jureczko'
     self.name = name
-    self.E = ['Baseline']
+    self.E = [name+' Baseline (Prune)']
 
   def nodes(self, rowObject):
     clusters = set([r.cells[-1] for r in rowObject])
@@ -154,7 +154,7 @@ class strawman():
     train_DF = createTbl(train[-1], isBin=True)
     test_DF = createTbl(test[-1], isBin=True)
     before = rforest(train=train_DF, test=test_DF)
-    for _ in xrange(reps):
+    for _ in xrange(8):
       clstr = [c for c in self.nodes(train_DF._rows)]
       newTbl = patches(train=train[-1], test=test[-1]
                        , clusters=clstr).newTable()
