@@ -10,7 +10,6 @@ def eDist(row1, row2):
   "Euclidean Distance"
   return sum([(a * a - b * b)**0.5 for a, b in zip(row1[:-1], row2[:-1])])
 
-
 class node():
   """
   A data structure to hold all the rows in a cluster.
@@ -51,7 +50,9 @@ class patches():
   "Apply new patch."
 
   def __init__(self, test, clusters):
-    self.test = createTbl(test, isBin=False)
+    self.train = createTbl(train, isBin=True) 
+    self.test = createTbl(test, isBin=True)
+    self.pred = rforest(train, test, smoteit=True, duplicate=True)
     self.clusters = clusters
 
   def delta(self, node1, node2):
@@ -68,10 +69,10 @@ class patches():
     return (array(t.cells[:-2]) + self.delta(t)).tolist()
 
   def newTable(self):
-    oldRows = self.test._rows
+    oldRows = [self.test._rows]
     newRows = [self.newRow(t) for t in oldRows]
 
-  def deltas(self):
+  def deltas(self, name='ant'):
     "Changes"
     header = array([h.name[1:] for h in self.test.headers[:-2]])
     delta = array([self.delta(t) for t in self.test._rows])
@@ -90,9 +91,9 @@ class patches():
 
 class strawman():
 
-  def __init__(self):
+  def __init__(self, name = "ant"):
     self.dir = './Jureczko'
-    pass
+    self.name = name
 
   def nodes(self, rowObject):
     clusters = set([r.cells[-1] for r in rowObject])
@@ -107,7 +108,7 @@ class strawman():
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
     clusters = [c for c in self.nodes(train_DF)]
-    newTbl = patches(test[-1], clusters).newTable()
+    newTbl = patches(train[-1], test[-1], clusters).newTable()
     # -------- DEBUG --------
     set_trace()
 
