@@ -5,6 +5,8 @@ from pdb import set_trace
 from methods1 import createTbl
 from Prediction import rforest
 from weights import weights as W
+from os import environ, getcwd
+import sys
 # Update PYTHONPATH
 HOME = environ['HOME']
 axe = HOME + '/git/axe/axe/'  # AXE
