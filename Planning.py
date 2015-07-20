@@ -94,8 +94,7 @@ class store():
         if el > maxel:
           maxel = el
           id = i
-      return mean([r.cells[-2] for r in node.rows if r.cells[-1] == id])
-      set_trace()
+      return mean([r.cells[-2] for r in node.rows if r.cells[-1] == unq[id])
     else:
       return mean([r.cells[-2] for r in node.rows])
 
