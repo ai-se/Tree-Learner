@@ -118,7 +118,8 @@ class strawman():
     train, test = run(dataName='ant').categorize()
     train_DF = createTbl(train[-1], isBin=False)._rows
     clstr = [c for c in self.nodes(train_DF)]
-    newTbl = patches(train=train[-1], test=test[-1], clusters=clstr).deltas()
+    newTbl = patches(train=train[-1], test=test[-1]
+                     , clusters=clstr).deltasCSVWriter()
     # -------- DEBUG --------
     set_trace()
 
