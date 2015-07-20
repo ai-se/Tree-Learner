@@ -73,7 +73,7 @@ class data():
   """
   Hold training and testing data
   """
-  def __init__(self, dataName='ant', dir="./Data"):
+  def __init__(self, dataName='ant', dir="./Jureczko"):
     projects = [Name for _, Name, __ in walk(dir)][0]
     numData = len(projects)  # Number of data
     one, two = explore(dir)
@@ -111,6 +111,8 @@ class testOracle():
       set_trace()
 
 if __name__=="__main__":
-  testOracle(file='ant').main()
+  for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+    print('### '+ name)
+    testOracle(file='ant').main()
 
 
