@@ -91,8 +91,8 @@ class run():
 
     for _ in xrange(self.reps):
       predRows = []
-      train_DF = createTbl(self.train[self._n], isBin=False)
-      test_df = createTbl(self.test[self._n], isBin=False)
+      train_DF = createTbl(self.train[self._n], isBin=True)
+      test_df = createTbl(self.test[self._n], isBin=True)
       actual = Bugs(test_df)
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
@@ -107,7 +107,7 @@ class run():
       predTest = clone(test_df, rows=predRows)
       newTab = treatments(
           train=self.train[
-              self._n], test_DF=predTest).main()
+              self._n], test_DF=predTest, bin=True).main()
 
       after = self.pred(train_DF, newTab,
                         tunings=self.tunedParams,
@@ -173,7 +173,7 @@ class run():
 
 
 def _test(file='ant'):
-  for file in ['ivy', 'lucene', 'poi', 'jedit', 'ant']:
+  for file in ['lucene', 'jedit']:
     print('##', file)
     R = run(dataName=file, reps=10).go()
 
@@ -221,7 +221,7 @@ def rdiv():
       lists.append(float(ll))
     return lists
 
-  f = open('./Jureczko.txt')
+  f = open('./ant.dat')
   for line in f:
     lst.append(striplines(line[:-1]))
 
@@ -238,7 +238,7 @@ def deltaTest():
 if __name__ == '__main__':
   _test(file='ant')
   # deltaTest()
-  #   rdiv()
+#   rdiv()
   # deltaCSVwriter(type='All')
 #   deltaCSVwriter(type='Indv')
 #   eval(cmd())

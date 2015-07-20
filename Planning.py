@@ -69,7 +69,7 @@ class deltas():
 
 class store():
 
-  def __init__(self, node, majority=True):
+  def __init__(self, node, majority=False):
     self.node = node
     self.dist = 0
     self.DoC = 0
