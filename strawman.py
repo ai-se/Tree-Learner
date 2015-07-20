@@ -1,11 +1,13 @@
-import csv
-from numpy import array, asarray, mean, median, percentile, size
+#! /Users/rkrsn/miniconda/bin/python
+from __future__ import print_function, division
+from numpy import array, asarray, mean, median, percentile, size, sum
 from run import run
 from pdb import set_trace
 from methods1 import createTbl
 from Prediction import rforest
 from weights import weights as W
 from os import environ, getcwd
+import csv
 import sys
 # Update PYTHONPATH
 HOME = environ['HOME']
@@ -106,12 +108,12 @@ class patches():
 
     header = [h.name for h in self.test.headers[:-1]]
     with open('tmp.csv', 'w') as csvfile:
-      writer = csv.writer(csvfile, delimiter=' ')
+      writer = csv.writer(csvfile, delimiter=',')
       writer.writerow(header)
       for el in newRows:
-        writer.writerow(el+[None])
+        writer.writerow(el+[0])
     
-    return createTbl('tmp.csv')
+    return createTbl(['tmp.csv'])
 
   def deltasCSVWriter(self, name='ant'):
     "Changes"
@@ -136,6 +138,7 @@ class strawman():
   def __init__(self, name = "ant"):
     self.dir = './Jureczko'
     self.name = name
+    self.E = ['Baseline']
 
   def nodes(self, rowObject):
     clusters = set([r.cells[-1] for r in rowObject])
@@ -151,13 +154,16 @@ class strawman():
     train_DF = createTbl(train[-1], isBin=True)
     test_DF = createTbl(test[-1], isBin=True)
     before = rforest(train=train_DF, test=test_DF)
-    clstr = [c for c in self.nodes(train_DF._rows)]
-    newTbl = patches(train=train[-1], test=test[-1]
-                     , clusters=clstr).newTable()
-    after = rforest(train=train_DF, test=newTbl)
-
-    # -------- DEBUG --------
-    set_trace()
+    for _ in xrange(reps):
+      clstr = [c for c in self.nodes(train_DF._rows)]
+      newTbl = patches(train=train[-1], test=test[-1]
+                       , clusters=clstr).newTable()
+      after = rforest(train=train_DF, test=newTbl)
+      self.E.append(sum(after)/sum(before))
+    print(self.E)
+    # # -------- DEBUG --------
+    # set_trace()
 
 if __name__ == '__main__':
-  strawman().main()
+  for name in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
+    strawman(name).main()
