@@ -13,7 +13,7 @@ pystat = HOME + '/git/pystats/'  # PySTAT
 cwd = getcwd()  # Current Directory
 sys.path.extend([axe, pystat, cwd])
 
-from Planning import *
+from CROSSTREES import xtrees
 from Prediction import *
 from _imports import *
 from abcd import _Abcd
@@ -38,17 +38,8 @@ def write2file(data, fname='Untitled', ext='.txt'):
 class run():
 
   def __init__(
-          self,
-          pred=rforest,
-          _smoteit=True,
-          _n=-1,
-          _tuneit=False,
-          dataName=None,
-          reps=1,
-          extent=0.5,
-          fSelect=False,
-          Prune=False,
-          infoPrune=0.75):
+          self, pred=rforest, _smoteit=True, _n=-1
+          , _tuneit=True, dataName=None, reps=1):
     self.pred = pred
     self.dataName = dataName
     self.out, self.out_pred = [self.dataName], []
@@ -56,13 +47,10 @@ class run():
     self.train, self.test = self.categorize()
     self.reps = reps
     self._n = _n
-    self.tunedParams = None if not _tuneit else tuner(
-        self.pred, self.train[_n])
-    self.headers = createTbl(
-        self.train[
-            self._n],
-        isBin=False,
-        bugThres=1).headers
+    self.tunedParams = None if not _tuneit \
+    else tuner(self.pred, self.train[_n])
+    self.headers = createTbl(self.train[self._n], isBin=False
+                             , bugThres=1).headers
 
   def categorize(self):
     dir = './Jureczko'
@@ -98,22 +86,19 @@ class run():
                          tunings=self.tunedParams,
                          smoteit=True)
 
-      for predicted, row in zip(before, test_df._rows):
-        tmp = row.cells
-#         tmp[-2] = row.cells
-        if predicted > 0:
-          predRows.append(tmp)
-
+      predRows = [row.cells for predicted
+                  , row in zip(before, test_df._rows) if predicted > 0]
       predTest = clone(test_df, rows=predRows)
-      newTab = treatments(
-          train=self.train[
-              self._n], test_DF=predTest, bin=True).main()
+
+      newTab = xtrees(train=self.train[self._n]
+                          , test_DF=predTest, bin=False).main()
 
       after = self.pred(train_DF, newTab,
                         tunings=self.tunedParams,
                         smoteit=True)
 
       self.out_pred.append(_Abcd(before=actual, after=before))
+
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
       frac = sum([1 if a > 0 else 0 for a in after]) / \
           sum([1 if b > 0 else 0 for b in before])
@@ -161,7 +146,7 @@ class run():
     """
     for _ in xrange(1):
       predTest = clone(test_df, rows=predRows)
-      newTab = treatments(train=self.train[self._n], test_DF=predTest).main()
+      newTab = xtrees(train=self.train[self._n], test_DF=predTest).main()
       newRows = np.array(map(lambda Rows: Rows.cells[:-1], newTab._rows))
       write2file(newRows, fname='after')  # save file
       delta.append([d for d in self.delta0(norm=min_max())])
@@ -173,7 +158,7 @@ class run():
 
 
 def _test(file='ant'):
-  for file in ['ivy', 'poi', 'ant']:
+  for file in ['ivy', 'jedit', 'lucene', 'poi', 'ant']:
     print('##', file)
     R = run(dataName=file, reps=10).go()
 
@@ -230,15 +215,15 @@ def rdiv():
 
 
 def deltaTest():
-  for file in ['jedit', 'ant']:
+  for file in ['ivy', 'poi', 'jedit', 'ant', 'lucene']:
     print('##', file)
     R = run(dataName=file, reps=10).deltas()
 
 
 if __name__ == '__main__':
-  #   _test(file='ant')
-  # deltaTest()
-  #   rdiv()
-  deltaCSVwriter(type='All')
-#   deltaCSVwriter(type='Indv')
-#   eval(cmd())
+  _test()
+#deltaTest()
+#rdiv()
+#deltaCSVwriter(type='All')
+#deltaCSVwriter(type='Indv')
+#  eval(cmd())

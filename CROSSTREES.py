@@ -3,7 +3,7 @@ from __future__ import print_function
 from __future__ import division
 from os import environ, getcwd
 from pdb import set_trace
-from random import uniform, randint
+from random import uniform, randint, shuffle
 import sys
 
 # Update PYTHONPATH
@@ -99,7 +99,7 @@ class store():
       return mean([r.cells[-2] for r in node.rows])
 
 
-class treatments():
+class xtrees():
 
   "Treatments"
 
@@ -174,7 +174,7 @@ class treatments():
         seen(node.node.branch)
     return attr
 
-  def finder2(self, node, alpha=0.1, pos='far'):
+  def finder2(self, node, alpha=0.5, pos='far'):
     """
     finder2 is a more elegant version of finder that performs a search on
     the entire tree to find leaves which are better than a certain 'node'
@@ -252,8 +252,9 @@ class treatments():
         node.contrastSet = [self.finder2(node.loc, pos='near')]
 
         # Now generate 1 potential patch
-        patch = node.patches(self.keys, N_Patches=1)
-
+        patch = node.patches(self.keys, N_Patches=5)
+        # Shuffle
+        shuffle(patch)
         p = patch.pop()
         tmpTbl = clone(self.test_DF,
                        rows=[k.cells for k in p],
@@ -265,13 +266,13 @@ class treatments():
     return clone(self.test_DF, rows=[k.cells for k in self.mod], discrete=True)
 
 
-def planningTest():
+def _planningTest():
   # Test contrast sets
   n = 0
   Dir = 'Data/'
   one, two = explore(Dir)
   # Training data
-  _ = treatments(train=one[n],
+  _ = xtrees(train=one[n],
                  test=two[n],
                  verbose=True,
                  smoteit=False).main()
@@ -280,4 +281,4 @@ def planningTest():
   set_trace()
 
 if __name__ == '__main__':
-  planningTest()
+  _planningTest()
