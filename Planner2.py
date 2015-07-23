@@ -215,8 +215,8 @@ class treatments():
     # Decision Tree
     t = discreteNums(self.train_DF, map(lambda x: x.cells, self.train_DF._rows))
     myTree = tdiv(t)
-#    showTdiv(myTree)
-#    set_trace()
+    showTdiv(myTree)
+    set_trace()
     # Testing data
     testCase = self.test_DF._rows
     for tC in testCase:
