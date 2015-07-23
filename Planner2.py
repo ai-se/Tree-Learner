@@ -48,13 +48,13 @@ class deltas():
   def createNew(self, stuff, keys, N=1):
     newElem = []
     tmpRow = self.row
-    prob = [2**-d for d in xrange(1, len(stuff) + 1)]
+    prob = [2 ** -d for d in xrange(1, len(stuff) + 1)]
     for _ in xrange(N):
-      for s, p in zip(stuff, prob):
-        lo, hi = s[1]
-        pos = keys[s[0].name]
+      for ss, p in zip(stuff, prob):
+        lo, hi = ss[1]
+        pos = keys[ss[0].name]
         # if uniform(0,1)>0.5 else tmpRow.cells[pos]
-        tmpRow.cells[pos] = int(not tmpRow.cells[pos])
+        tmpRow.cells[pos] = int(lo)
       newElem.append(tmpRow)
     return newElem
 
@@ -86,9 +86,9 @@ class treatments():
   def __init__(self, train=None, test=None, test_DF=None,
                verbose=True, smoteit=True, bin=False):
     self.train, self.test = train, test
-    self.train_DF = createTbl(train, _smote=smoteit, isBin=bin)
+    self.train_DF = createTbl(train, _smote=smoteit, isBin=False)
     if not test_DF:
-      self.test_DF = createTbl(test, isBin=bin)
+      self.test_DF = createTbl(test, isBin=False)
     else:
       self.test_DF = test_DF
     self.verbose, self.smoteit = verbose, smoteit
@@ -213,13 +213,10 @@ class treatments():
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     # Decision Tree
-    t = discreteNums(
-        self.train_DF,
-        map(lambda x: x.cells,
-            self.train_DF._rows))
+    t = discreteNums(self.train_DF, map(lambda x: x.cells, self.train_DF._rows))
     myTree = tdiv(t)
-    # showTdiv(myTree)
-
+#    showTdiv(myTree)
+#    set_trace()
     # Testing data
     testCase = self.test_DF._rows
     for tC in testCase:

@@ -335,10 +335,10 @@ def _test(name='Apache', doWhat='Accuracy'):
 
 if __name__ == '__main__':
 
-  rdiv()
+#  rdiv()
   #   _testPlot()
   #  _test('BDBC', 'Median')
-  for name in ['BDBC']:
+  for name in ['Apache', 'BDBC', 'BDBJ', 'LLVM', 'X264', 'SQL']:
     # deltasTester(name)
     _test(name=name, doWhat='AUC')
 #   eval(cmd())

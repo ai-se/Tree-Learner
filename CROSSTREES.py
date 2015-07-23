@@ -233,10 +233,7 @@ class xtrees():
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     # Decision Tree
-    t = discreteNums(
-        self.train_DF,
-        map(lambda x: x.cells,
-            self.train_DF._rows))
+    t = discreteNums(self.train_DF, map(lambda x: x.cells, self.train_DF._rows))
     myTree = tdiv(t)
 
     # Testing data

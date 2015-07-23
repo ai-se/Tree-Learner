@@ -81,7 +81,7 @@ class run():
       predRows = []
       train_DF = createTbl(self.train[self._n], isBin=True)
       test_df = createTbl(self.test[self._n], isBin=True)
-      actual = Bugs(test_df)
+      actual = array(Bugs(test_df))
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
                          smoteit=True)
@@ -91,17 +91,17 @@ class run():
       predTest = clone(test_df, rows=predRows)
 
       newTab = xtrees(train=self.train[self._n]
-                          , test_DF=predTest, bin=False).main()
+                          , test_DF=predTest, bin=True).main()
 
       after = self.pred(train_DF, newTab,
                         tunings=self.tunedParams,
                         smoteit=True)
 
       self.out_pred.append(_Abcd(before=actual, after=before))
-
+      set_trace()
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
-      frac = sum([1 if a > 0 else 0 for a in after]) / \
-          sum([1 if b > 0 else 0 for b in before])
+      frac = sum([0 if a < 1 else 1 for a in after]) / \
+          sum([0 if b < 1 else 1 for b in before])
       self.out.append(frac)
     print(self.out)
 
