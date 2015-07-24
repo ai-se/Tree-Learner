@@ -81,7 +81,7 @@ class run():
       predRows = []
       train_DF = createTbl(self.train[self._n], isBin=True)
       test_df = createTbl(self.test[self._n], isBin=True)
-      actual = array(Bugs(test_df))
+      actual = np.array(Bugs(test_df))
       before = self.pred(train_DF, test_df,
                          tunings=self.tunedParams,
                          smoteit=True)
@@ -91,7 +91,7 @@ class run():
       predTest = clone(test_df, rows=predRows)
 
       newTab = xtrees(train=self.train[self._n]
-                          , test_DF=predTest, bin=True).main()
+                          , test_DF=predTest, bin=False).main()
 
       after = self.pred(train_DF, newTab,
                         tunings=self.tunedParams,

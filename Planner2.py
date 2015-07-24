@@ -194,7 +194,7 @@ class treatments():
       bests.update(
           {dd: sorted([v for v in best if v.DoC == dd], key=lambda F: F.dist)})
       attr.update({dd: self.attributes(
-          sorted([v for v in best if v.DoC == dd], key=lambda F: F.dist))})
+          sorted([v for v in best if v.DoC == dd], key=lambda F: F.score))})
 
     if pos == 'near':
       return attr[unq[-1]][0]
