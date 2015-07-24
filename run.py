@@ -39,7 +39,7 @@ class run():
 
   def __init__(
           self, pred=rforest, _smoteit=True, _n=-1
-          , _tuneit=True, dataName=None, reps=1):
+          , _tuneit=False, dataName=None, reps=1):
     self.pred = pred
     self.dataName = dataName
     self.out, self.out_pred = [self.dataName], []
@@ -98,7 +98,7 @@ class run():
                         smoteit=True)
 
       self.out_pred.append(_Abcd(before=actual, after=before))
-      set_trace()
+      # set_trace()
       delta = cliffs(lst2=Bugs(predTest), lst1=after).delta()
       frac = sum([0 if a < 1 else 1 for a in after]) / \
           sum([0 if b < 1 else 1 for b in before])
